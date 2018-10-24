@@ -10,7 +10,7 @@ All entries must be built on Bytom smart contracts while fully
 embodying the value and advantage of Blockchain technology
 and proving that the Blockchain technology is definitely
 irreplaceable when compared with the solutions based on the
-traditional technology.  
+traditional technology. 
 
 JR1)V-Story Answer
 ----
@@ -30,6 +30,8 @@ Social Life Service V-Story는 저작권보호, 보안, 공정성과 투명성�
 
 <img src='p1.png'/>
 
+-------------------------------------
+
 JR2)Technology Implementation
 ====
 
@@ -44,6 +46,8 @@ JR2)V-Story Answer
 <img src='p2.png'/>
 
 
+-------------------------------------
+
 JR3)Commercial Value
 ====
 
@@ -54,6 +58,8 @@ application for potential profitability.
 JR3)V-Story Answer
 ----
 
+
+-------------------------------------
 
 JR4)Creativity
 ====
@@ -68,6 +74,8 @@ JR4)V-Story Answer
 V-Story 텍스트, 사진, 영상을 넘어 아바타, 홈꾸미기 등을 통해 자신만의 개성있는 SNS를 만들며 다른 사용자와  
 관계형 네트워크를 형성할 수 있는 새로운 개념의 비쥬얼 Social Life Service 플랫폼입니다.  
   
+
+-------------------------------------
   
 JR5)roduct Design
 ====
