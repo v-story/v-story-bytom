@@ -50,6 +50,8 @@ should illustrate innovation and creativity with better
 performance.
 
 **V-Story Answer**
+V-Story 텍스트, 사진, 영상을 넘어 아바타, 홈꾸미기 등을 통해 자신만의 개성있는 SNS를 만들며 다른 사용자와 
+관계형 네트워크를 형성할 수 있는 새로운 개념의 비쥬얼 Social Life Service 플랫폼입니다.
 
 
 JR5-ENG)**Product Design**
@@ -58,6 +60,8 @@ can easily understand and use, thus achieving a better user
 experience.
 
 **V-Story Answer**
+자신의 기분과 감정을 표현하고 좀 더 깊이 공감할 수 있는 다양한 Visual 상호작용 기능 제공
+‘설치’ 없이 다양한 디바이스에서 구동, 외부 콘텐츠와 쉽게 연동
 
 
 
