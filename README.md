@@ -14,8 +14,8 @@ and proving that the Blockchain technology is definitely
 irreplaceable when compared with the solutions based on the
 traditional technology. 
 
-| JR1.V-Story Answer |
-| --- |
+JR1.V-Story Answer
+----
 
 Social Life Service V-Story는 저작권보호, 보안, 공정성과 투명성을 중시하는 탈중앙화 서비스 입니다.      
   > 저작권에서는 SNS 주요 자산인 사용자들이 생산한 콘텐츠에 대한 저작권을 블록체인 기술을 통해 보호하며,  
