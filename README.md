@@ -1,27 +1,26 @@
 **Judging Rules & V-Story Answer**
 
-JR1-ENG)**Blockchain Adoption**
+JR1)**Blockchain Adoption**
 All entries must be built on Bytom smart contracts while fully
 embodying the value and advantage of Blockchain technology
 and proving that the Blockchain technology is definitely
 irreplaceable when compared with the solutions based on the
 traditional technology.
 
-JR1-KOR)**Blockchain Adoption** 
--Blockchain 기술의 가치와 이점을 충분히 이해하고 구현 했는가? 
--Blockchain 기반이 기존 기반과 달리 확실히 바뀔 수 없다는 것을 입증 하는가? 
--모든 항목은 Bytom 스마트 계약을 토대로 구현 했는가? 
-
-V-Story Blockchain Adoption 
+**V-Story Answer**
 .Social Life Service V-Story는 저작권보호, 보안, 공정성과 투명성을 중시하는 탈중앙화 서비스 입니다.
-.저작권에서는 SNS 주요 자산인 사용자들이 생산한 콘텐츠에 대한 저작권을 블록체인 기술을 통해 보호하며,
- 보안에서는 사용자 간의 토큰 유통을 블록체인기술로 기록하여 변조를 방지하고 보안성을 높이고, 
- 공정성과 투명성에서는 토큰의 흐름과 보유 및 보상을 누구나 확인할 수 있게 공개합니다. 
- 이로 인하여 2차 저작물의 활성화 및 가짜 뉴스 및 악성댓글등의 
- SNS 사회적 문제 해소, 개인간 거래의 투명성을 높이고자 합니다.
+.저작권에서는 SNS 주요 자산인 사용자들이 생산한 콘텐츠에 대한 저작권을 블록체인 기술을 통해 보호하며, 
+  보안에서는 사용자 간의 토큰 유통을 블록체인기술로 기록하여 변조를 방지하고 보안성을 높이고, 
+  공정성과 투명성에서는 토큰의 흐름과 보유 및 보상을 누구나 확인할 수 있게 공개합니다. 
+  이로 인하여 2차 저작물의 활성화 및 가짜 뉴스 및 악성댓글등의 SNS 사회적 문제 해소, 
+  개인간 거래의 투명성을 높이고자 합니다.
 
+.우리는 Bytom 블록체인 프로토콜이 가상세계와 현실세계를 연결시켜 인간이 상상할 수 있는 
+  모든 자산의 거래를 가능하게 하는 쌍방향 프로토콜이며, 세계에서 가장 안전하고 가장 큰 자산거래 및 
+  관리 프로토콜이 되는 것이 목표이고, 자체적으로 구축한 메인넷 내의 생태계는 개방형, 준법성, 공익성이라는 
+  3가지 특징이 있음을 확인하였습니다. 이에 V-Story가 추구하는 Social Life Service  플랫폼으로 확장에 
+  큰 도움이 될 것이라 기대하고 있습니다.
 ![enter image description here](C:%5CUsers%5CAdministrator%5CDesktop%5Cp1.png)
-
 
 
 JR2-ENG)**Technology Implementation**
@@ -30,12 +29,7 @@ complete functional design. Its stable operation is absolutely a
 guarantee for efficiency and quality. Moreover, it is designed
 with sufficient safety and protection mechanism.
 
-JR2-KOR)**기술 구현** 
--합리적이며 완벽한 기능을 갖고 있는가? 
--효율과 품질을 보장하며 안정적으로 동작 하는가? 
--안전하고 보호받는 설계 인가? 
-
-V-Story Technology Implementation
+**V-Story Answer**
 ![enter image description here](C:%5CUsers%5CAdministrator%5CDesktop%5Cp2.png)
 
 
@@ -46,30 +40,24 @@ If entries presents great commercial value, they can be
 commercialized directly as representatives of industry
 application for potential profitability.
 
-JR3-KOR)**상업적 가치** 
--상업적 가치를 갖고 있는기? 
--잠재적인 수익성을 갖고 있으며 상용화 될 수 있는가? 
+**V-Story Answer**
 
 
 
 JR4-ENG)**Creativity**
 Compared with those mature solutions in the industry, entries
-should illustrate innovation and creativity with better performance.
+should illustrate innovation and creativity with better
+performance.
 
-JR4-KOR)**창의력** 
--타 솔루션과 비교하여, 더 나은 성능을 갖으며 혁신과 창의성을 갖고 있는가? 
-
+**V-Story Answer**
 
 
 JR5-ENG)**Product Design**
 The interactive design should be reasonable so that customers
-can easily understand and use, thus achieving a better user experience.
+can easily understand and use, thus achieving a better user
+experience.
 
-JR5-KOR)**제품 디자인** 
--고객이 쉽게 이해하고 사용할 수 있는 사용자 인터페이스와 좋은 사용자 경험을 갖고 있는가?
-
-
-
+**V-Story Answer**
 
 
 
