@@ -4,6 +4,10 @@ Judging Rules & V-Story Answer
 | Table of Contents |
 | --- |
 | [JR1 Blockchain Adoption](#JR1-Blockchain-Adoption) |
+| [JR2 Technology Implementation](#JR2-Technology-Implementation) |
+| [JR3 Commercial Value](#JR3-Commercial-Value) |
+| [JR4 Creativity](#JR4-Creativity) |
+| [JR5 Product Design](#JR5-Product-Design) |
 
 ---------------------------------
 
