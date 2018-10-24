@@ -1,11 +1,15 @@
 Judging Rules & V-Story Answer  
 ====
 
+| Table of Contents |
+| --- |
+| [JR1 Blockchain Adoption](#JR1-Blockchain-Adoption) |
+
 ---------------------------------
 
 <img src='p0.png'/>
 
-JR1.Blockchain Adoption
+JR1 Blockchain Adoption
 ====
 
 All entries must be built on Bytom smart contracts while fully
@@ -14,7 +18,7 @@ and proving that the Blockchain technology is definitely
 irreplaceable when compared with the solutions based on the
 traditional technology. 
 
-JR1.V-Story Answer
+JR1 V-Story Answer
 ----
 
 Social Life Service V-Story는 저작권보호, 보안, 공정성과 투명성을 중시하는 탈중앙화 서비스 입니다.      
@@ -34,7 +38,7 @@ Social Life Service V-Story는 저작권보호, 보안, 공정성과 투명성�
 
 -------------------------------------
 
-JR2.Technology Implementation
+JR2 Technology Implementation
 ====
 
 The smart contract projects should feature rational design and
@@ -42,7 +46,7 @@ complete functional design. Its stable operation is absolutely a
 guarantee for efficiency and quality. Moreover, it is designed
 with sufficient safety and protection mechanism.  
   
-JR2.V-Story Answer
+JR2 V-Story Answer
 ----
 
 <img src='p2.png'/>
@@ -50,27 +54,27 @@ JR2.V-Story Answer
 
 -------------------------------------
 
-JR3.Commercial Value
+JR3 Commercial Value
 ====
 
 If entries presents great commercial value, they can be
 commercialized directly as representatives of industry
 application for potential profitability.  
   
-JR3.V-Story Answer
+JR3 V-Story Answer
 ----
 
 
 -------------------------------------
 
-JR4.Creativity
+JR4 Creativity
 ====
 
 Compared with those mature solutions in the industry, entries
 should illustrate innovation and creativity with better
 performance.  
 
-JR4.V-Story Answer
+JR4 V-Story Answer
 ----
 
 V-Story 텍스트, 사진, 영상을 넘어 아바타, 홈꾸미기 등을 통해 자신만의 개성있는 SNS를 만들며 다른 사용자와  
@@ -79,14 +83,14 @@ V-Story 텍스트, 사진, 영상을 넘어 아바타, 홈꾸미기 등을 통�
 
 -------------------------------------
   
-JR5.Product Design
+JR5 Product Design
 ====
 
 The interactive design should be reasonable so that customers
 can easily understand and use, thus achieving a better user
 experience.  
   
-JR5.V-Story Answer
+JR5 V-Story Answer
 ----
 
 자신의 기분과 감정을 표현하고 좀 더 깊이 공감할 수 있는 다양한 Visual 상호작용 기능 제공
