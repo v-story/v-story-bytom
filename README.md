@@ -1,4 +1,6 @@
-**Judging Rules & V-Story Answer**
+**Judging Rules & V-Story Answer**  
+  
+<img src='p0.png'/>
 
 JR1)**Blockchain Adoption**
 All entries must be built on Bytom smart contracts while fully
