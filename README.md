@@ -8,10 +8,12 @@ Judging Rules & V-Story Answer
 | [JR3 Commercial Value](#JR3-Commercial-Value) |
 | [JR4 Creativity](#JR4-Creativity) |
 | [JR5 Product Design](#JR5-Product-Design) |
-  
-<iframe id="ytplayer" type="text/html" width="640" height="360"
-  src="http://www.youtube.com/embed/9_XYITl0TK8"
-  frameborder="0"/>
+
+<div align="center">
+    <iframe width="620" height="315"
+        src="https://www.youtube.com/embed/9_XYITl0TK8">
+    </iframe>
+</div>
 
 ---------------------------------
 
