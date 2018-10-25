@@ -9,6 +9,10 @@ Judging Rules & V-Story Answer
 | [JR4 Creativity](#JR4-Creativity) |
 | [JR5 Product Design](#JR5-Product-Design) |
 
+<iframe id="ytplayer" type="text/html" width="640" height="360" src="http://www.youtube.com/embed/M7lc1UVf-VE?autoplay=1&origin=https://www.youtube.com/watch?v=9_XYITl0TK8" frameborder="0"/>
+  
+ <video src='테스트.mp4'/>
+
 ---------------------------------
 
 <img src='p0.png'/>
