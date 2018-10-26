@@ -51,6 +51,10 @@ guarantee for efficiency and quality. Moreover, it is designed
 with sufficient safety and protection mechanism.  
   
 JR2 V-Story Answer
+
+<img src='images/p2.png'/>
+<img src='images/p3.png'/>
+
 ----
 
 
