@@ -11,7 +11,7 @@ Judging Rules & V-Story Answer
 
 ---------------------------------
 
-<img src='p0.png'/>
+<img src='images/p0.png'/>
 
 JR1 Blockchain Adoption
 ====
@@ -38,7 +38,7 @@ Social Life Service V-Story는 저작권보호, 보안, 공정성과 투명성�
   > 3가지 특징이 있음을 확인하였습니다. 이에 V-Story가 추구하는 Social Life Service  플랫폼으로 확장에   
   > 큰 도움이 될 것이라 기대하고 있습니다.  
 
-<img src='p1.png'/>
+<img src='images/p1.png'/>
 
 -------------------------------------
 
@@ -53,7 +53,6 @@ with sufficient safety and protection mechanism.
 JR2 V-Story Answer
 ----
 
-<img src='p2.png'/>
 
 
 -------------------------------------
