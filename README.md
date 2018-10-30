@@ -58,6 +58,7 @@ JR2 V-Story Answer
 
 <img src='images/tech1.PNG'/>
 
+### 구현 된 V- STORY ID와 BYTOM ALIAS ID 연동 소스 코드
 ```javascript
 if(0==balanceList.size())
 {
@@ -98,6 +99,7 @@ return json;
 
 <img src='images/tech2.PNG'/>
 
+### BTM → SMILE 실제 구현된 소스 코드
 ```javascript
 Client client = ByTomConnectionUtil.generateClient();
 Account.ReceiverBuilder receiverBuilder =   new Account.ReceiverBuilder().setAccountAlias(reveiverId);
@@ -129,6 +131,7 @@ return true;
 
 <img src='images/tech3.PNG'/>
 
+### BTM → SMILE 환전 실제 구현된 소스 코드
 ```javascript
 TransactionnoLog.Template controlAddress = new TransactionnoLog.Builder()
         .addAction(
@@ -153,6 +156,7 @@ transactionThread.start();
 return true;
 ```
 
+### 사용자가 보유한 BTM, SMILE의 잔액 조회 소스 코드
 ```javascript
 public List<BalancenoLog> getBalance(String accountAlias,String assetAlias)
 {
@@ -171,6 +175,7 @@ public List<BalancenoLog> getBalance(String accountAlias,String assetAlias)
 
 <img src='images/tech4.PNG'/>
 
+### 거래 내역 소스코드
 ```javascript
 public List<BalancenoLog> getBalanceList(String accountAlias)
 {
