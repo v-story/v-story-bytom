@@ -56,6 +56,152 @@ JR2 V-Story Answer
 
 <img src='images/p3.png'/>
 
+<img src='images/tech1.PNG'/>
+
+```javascript
+if(0==balanceList.size())
+{
+    btmUserInfo.setBTM((double)0);
+    btmUserInfo.setBTM_ACCOUNT_ID(bytomModel.getBtmAccountAlias(id));
+}					
+else
+{	
+    userBalanceList = new ArrayList<UserBalance>();
+    //DecimalFormat format = new DecimalFormat(".##########");
+    for (BalancenoLog result : balanceList)
+    {
+        if(id.equals(result.accountAlias))
+        {	
+            if(id.equals(result.accountAlias) && "BTM".equals(result.assetAlias))
+            {	
+                btmUserInfo.setBTM((double)result.amount/bytomMargin);
+                btmUserInfo.setBTM_ACCOUNT_ID(result.accountId);
+                break;
+            }
+        }	
+    }
+}	
+
+Integer smile = bytomModel.getSmile(accountpk);
+JSONObject jsonObject = new JSONObject();
+jsonObject.put("RESULT", IConstants.SUCCESS);
+jsonObject.put("ACCOUNTID", btmUserInfo.getACCOUNT_ID());
+jsonObject.put("GENDER", btmUserInfo.getGENDER());
+jsonObject.put("INTRODUCE", btmUserInfo.getINTRODUCE());
+jsonObject.put("PROF_PIC_NM", btmUserInfo.getPROF_PIC_NM());
+jsonObject.put("BTM", btmUserInfo.getBTM());	
+jsonObject.put("BTM_ACCOUNT_ID", btmUserInfo.getBTM_ACCOUNT_ID());	
+jsonObject.put("SMILE", smile);	
+json = jsonObject.toString();
+return json;
+```
+
+<img src='images/tech2.PNG'/>
+
+```javascript
+Client client = ByTomConnectionUtil.generateClient();
+Account.ReceiverBuilder receiverBuilder =   new Account.ReceiverBuilder().setAccountAlias(reveiverId);
+Receiver receiver = receiverBuilder.create(client);	   		
+String receiverAddress = receiver.address;
+System.out.println("receiverAddress value is:" + receiverAddress);
+TransactionnoLog.Template controlAddress = new TransactionnoLog.Builder()
+        .addAction(
+                new TransactionnoLog.Action.SpendFromAccount()
+                        .setAccountAlias(senderId)
+                        .setAssetAlias(assetAlias)
+                        .setAmount((smile+gas)*bytommargin)
+        )
+        .addAction(
+                new TransactionnoLog.Action.ControlWithAddress()
+                        .setAddress(receiverAddress)
+                        .setAssetAlias(assetAlias)
+                        .setAmount(smile*bytommargin)
+        ).build(client);
+
+
+TransactionnoLog.Template singer = new TransactionnoLog.SignerBuilder().sign(client,
+        controlAddress, passwd);	
+TransactionnoLog.SubmitResponse txs = TransactionnoLog.submit(client, singer); 
+TransactionThread transactionThread = new TransactionThread(client,txs.tx_id,smile,fromAmount,toAmount,serverIndex,accountPk,1002);
+transactionThread.start();
+return true;
+```
+
+<img src='images/tech3.PNG'/>
+
+```javascript
+TransactionnoLog.Template controlAddress = new TransactionnoLog.Builder()
+        .addAction(
+                new TransactionnoLog.Action.SpendFromAccount()
+                        .setAccountAlias(senderId)
+                        .setAssetAlias(assetAlias)
+                        .setAmount((smile+gas)*bytommargin)
+        )
+        .addAction(
+                new TransactionnoLog.Action.ControlWithAddress()
+                        .setAddress(receiverAddress)
+                        .setAssetAlias(assetAlias)
+                        .setAmount(smile*bytommargin)
+        ).build(client);
+
+
+TransactionnoLog.Template singer = new TransactionnoLog.SignerBuilder().sign(client,
+        controlAddress, passwd);	
+TransactionnoLog.SubmitResponse txs = TransactionnoLog.submit(client, singer); 
+TransactionThread transactionThread = new TransactionThread(client,txs.tx_id,smile,fromAmount,toAmount,serverIndex,accountPk,1002);
+transactionThread.start();
+return true;
+```
+
+```javascript
+public List<BalancenoLog> getBalance(String accountAlias,String assetAlias)
+{
+    List<BalancenoLog> balanceList = null;
+    try
+    {
+        balanceList = new BalancenoLog.QueryBuilder().listByAccountAlias(client, accountAlias); 
+    }
+    catch(BytomException e)
+    {
+        e.printStackTrace();
+    }
+    return balanceList;
+}
+```
+
+<img src='images/tech4.PNG'/>
+
+```javascript
+public List<BalancenoLog> getBalanceList(String accountAlias)
+{
+    List<BalancenoLog> balanceList = null;
+    try
+    {
+        balanceList = new BalancenoLog.QueryBuilder().listByAccountAlias(client, accountAlias); 
+    }
+    catch(BytomException e)
+    {
+        e.printStackTrace();
+    }
+    return balanceList;
+}
+
+public List<TransactionnoLog> listTransaction(String accountAlias)
+{
+    List<TransactionnoLog> transactionList = null;
+    try
+    {
+        String bytomId = getBtmAccountAlias(accountAlias);
+        transactionList = new TransactionnoLog.QueryBuilder().setAccountId(bytomId).listByAccountId(client);
+    }
+    catch(BytomException e)
+    {
+        logger.error(e);
+    }
+    return transactionList;
+}  
+```
+
 ----
 
 
