@@ -207,10 +207,6 @@ public List<TransactionnoLog> listTransaction(String accountAlias)
 }  
 ```
 
-----
-
-
-
 -------------------------------------
 
 JR3 Commercial Value
