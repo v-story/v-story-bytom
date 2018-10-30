@@ -55,8 +55,6 @@ JR2 V-Story Answer
 
 <img src='images/p2.png'/>
 
-<img src='images/p3.png'/>
-
 <img src='images/tech1.PNG'/>
 
 ### 구현 된 V- STORY ID와 BYTOM ALIAS ID 연동 소스 코드
