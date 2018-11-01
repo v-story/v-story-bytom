@@ -1,0 +1,539 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+	<!DOCTYPE
+ sqlm SYSTEM "http://10.95.26.153/dtd/sqlm_2_1.dtd" [
+]
+	>
+<sqlm   ver="2.1">
+	<module name="myprofile" desc="프로필정보">
+	
+<!-- listSumNail4jqGrid -->
+		<sql name="myprofile.sumNaillistTotalCnt" execute="Select" type="PreparedStatement" desc="섬네일 리스트 개수">
+			<puts>
+				SELECT
+					COUNT(HOME_SEQ) AS CNT
+				FROM
+					TB_HOME_POST
+				WHERE
+					ACCOUNTPK = :ACCOUNTPK
+					AND (PIC_EXIST_YN = 1 OR VIDEO_EXIST_YN = 1)
+			</puts>
+		</sql>
+		<sql name="myprofile.pagePostSeqThumbNail_SNS" execute="Select" type="PreparedStatement" desc="페이지단위 게시물 시퀀스 얻기">
+			<param name="ACCOUNTPK" 		required="yes" 	desc="게시물 검색할 유저 시퀀스" />
+			<param name="OFFSET" 			required="yes" 	desc="" />
+			<param name="ROWS" 				required="yes" 	desc="" />
+			<puts>
+				SELECT
+					GROUP_CONCAT(B.POST_SEQ ORDER BY B.POST_SEQ DESC) AS STR_POST_SEQ
+				FROM
+					(
+					SELECT
+						A.*
+					FROM
+						(
+						SELECT
+							POST_SEQ,
+							PIC_EXIST_YN
+						FROM
+							TB_HOME_POST
+						WHERE
+							ACCOUNTPK = $ACCOUNTPK
+							AND (PIC_EXIST_YN = 1 OR VIDEO_EXIST_YN = 1)
+						) A
+ 					ORDER BY A.POST_SEQ DESC
+					LIMIT $OFFSET, $ROWS
+					) B
+				<!--
+				SELECT
+					GROUP_CONCAT(B.POST_SEQ ORDER BY B.PIC_EXIST_YN DESC, B.POST_SEQ DESC) AS STR_POST_SEQ
+				FROM
+					(
+					SELECT
+						A.*
+					FROM
+						(
+						SELECT
+							POST_SEQ,
+							PIC_EXIST_YN
+						FROM
+							TB_HOME_POST
+						WHERE
+							ACCOUNTPK = $ACCOUNTPK
+							AND (PIC_EXIST_YN = 1 OR VIDEO_EXIST_YN = 1)
+						) A
+ 					ORDER BY A.PIC_EXIST_YN DESC, A.POST_SEQ DESC
+					LIMIT $OFFSET, $ROWS
+					) B
+				-->
+			</puts>
+		</sql>
+		<sql name="myprofile.sumNaillist4jqGrid" execute="Select" type="PreparedStatement" desc="섬네일 리스트 조회">
+			<param name="POST_SEQ" 			required="yes" 	desc="유저시퀀스" />
+			<puts>
+				SELECT
+				    B.ACCOUNTPK,
+					A.*,
+					B.PIC_CNT,
+					B.VIDEO_CNT
+				FROM
+					(
+					SELECT
+						POST_SEQ,
+						<!-- CONCAT('/',SUBSTRING_INDEX(FILE_PATH, '/', -4)) FILE_PATH_URL, -->
+						FILE_NM,
+						FILE_TYPE 
+					FROM 
+						TB_FILE_INFO
+					WHERE 
+						POST_SEQ IN ($POST_SEQ)
+						AND FILE_NUM = 1
+					) A
+					LEFT OUTER JOIN
+					TB_POST B
+					ON A.POST_SEQ = B.POST_SEQ
+				ORDER BY FIELD (A.POST_SEQ,  $POST_SEQ)
+			</puts>	
+		</sql>
+
+<!-- listProfilePost4jqGrid -->
+		<sql name="myprofile.profilePostListTotalCntV2" execute="Select" type="PreparedStatement" desc="">
+			<param name="ACCOUNTPK" 		required="yes" 	desc="게시물 검색할 유저 시퀀스" />
+			<puts>
+				SELECT
+					COUNT(POST_SEQ) CNT
+				FROM
+					TB_HOME_POST
+				WHERE
+					ACCOUNTPK = $ACCOUNTPK
+			</puts>
+		</sql>	
+		<sql name="myprofile.pageProfilePostSeq_SNS" execute="Select" type="PreparedStatement" desc="게시물 시퀀스 얻기">
+			<param name="ACCOUNTPK" 		required="yes" 	desc="게시물 검색할 유저 시퀀스" />
+			<param name="OFFSET" 			required="yes" 	desc="" />
+			<param name="ROWS" 				required="yes" 	desc="" />
+			<puts>
+				SELECT
+					IFNULL(GROUP_CONCAT(A.POST_SEQ ORDER BY A.POST_SEQ DESC),0) AS STR_POST_SEQ
+				FROM
+					(
+					SELECT
+						POST_SEQ
+					FROM
+						TB_HOME_POST
+					WHERE
+						ACCOUNTPK = $ACCOUNTPK
+					ORDER BY POST_SEQ DESC
+					LIMIT $OFFSET, $ROWS
+					) A
+			</puts>
+		</sql>
+		<sql name="myprofile.getPostUserInfo_SNS" execute="Select" type="PreparedStatement" desc="post_seq 기준으로 유저 정보 얻기">
+			<param name="POST_SEQ" 			required="yes" 	desc="" />
+			<puts>
+				SELECT
+					A.POST_SEQ, 
+					A.ACCOUNTPK, 
+					B.ID, 
+					IFNULL(B.PROF_PIC_NM, 'profile_default.png') AS PROF_PIC_NM,
+					B.AVATAR_CD
+				FROM
+					(
+					SELECT
+						POST_SEQ, ACCOUNTPK
+					FROM
+						TB_HOME_POST
+					WHERE 
+						POST_SEQ IN ($POST_SEQ)
+					) A
+					LEFT OUTER JOIN
+					TB_USER B
+					ON A.ACCOUNTPK = B.ACCOUNTPK			
+			</puts>
+		</sql>	
+		<sql name="myprofile.profilePostList4jqGrid" execute="Select" type="PreparedStatement" desc="">
+			<param name="ACCOUNTPK"			required="yes" 	desc="유저 시퀀스" />
+			<param name="POST_SEQ" 			required="yes" 	desc="게시물  시퀀스" />
+			<puts>
+				SELECT
+					X1.*
+					,IFNULL(X2.FILE_NM_S, '') AS FILE_NM_S
+					,IFNULL(X2.FILE_TYPE_S, '') AS FILE_TYPE_S
+					,IF(X3.SMILE_SEQ IS NULL, 0, 1) AS SMILE
+					,IF(X4.HEART_SEQ IS NULL, 0, 1) AS HEART
+				FROM
+					(
+					SELECT
+						POST_SEQ,
+						CONT,
+						HEART_CNT,
+						SMILE_CNT,
+						COMMENT_CNT,
+						TIMESTAMPDIFF(HOUR, REG_TIME, NOW()) AS DIFF_TIME,
+						REG_TIME
+					FROM
+						TB_POST
+					WHERE 
+						POST_SEQ IN ($POST_SEQ)
+					) X1
+					LEFT OUTER JOIN
+					(
+					SELECT 
+						POST_SEQ, 
+						GROUP_CONCAT(FILE_NM ORDER BY FILE_NUM ASC) AS FILE_NM_S, 
+						GROUP_CONCAT(FILE_TYPE ORDER BY FILE_NUM ASC) AS FILE_TYPE_S 
+					FROM 
+						TB_FILE_INFO 
+					WHERE 
+						POST_SEQ IN ($POST_SEQ) 
+					GROUP BY POST_SEQ
+					) X2
+					ON X1.POST_SEQ = X2.POST_SEQ
+					LEFT OUTER JOIN
+					TB_SMILE_HIST X3
+					ON X1.POST_SEQ = X3.POST_SEQ AND X3.ACCOUNTPK = $ACCOUNTPK
+					LEFT OUTER JOIN
+					TB_HEART_HIST X4
+					ON X1.POST_SEQ = X4.POST_SEQ AND X4.ACCOUNTPK = $ACCOUNTPK
+				ORDER BY X1.POST_SEQ DESC
+			</puts>
+		</sql>		
+		<sql name="myprofile.profilePostList4kakao" execute="Select" type="PreparedStatement" desc="">
+			<param name="POST_SEQ" 			required="yes" 	desc="게시물  시퀀스" />
+			<puts>
+				SELECT
+					X1.*
+					,IFNULL(X2.FILE_NM_S, '') AS FILE_NM_S
+					,IFNULL(X2.FILE_TYPE_S, '') AS FILE_TYPE_S
+				FROM
+					(
+					SELECT
+						POST_SEQ,
+						CONT,
+						HEART_CNT,
+						SMILE_CNT,
+						COMMENT_CNT,
+						TIMESTAMPDIFF(HOUR, REG_TIME, NOW()) AS DIFF_TIME,
+						REG_TIME
+					FROM
+						TB_POST
+					WHERE 
+						POST_SEQ IN ($POST_SEQ)
+					) X1
+					LEFT OUTER JOIN
+					(
+					SELECT 
+						POST_SEQ, 
+						GROUP_CONCAT(FILE_NM ORDER BY FILE_NUM ASC) AS FILE_NM_S, 
+						GROUP_CONCAT(FILE_TYPE ORDER BY FILE_NUM ASC) AS FILE_TYPE_S 
+					FROM 
+						TB_FILE_INFO 
+					WHERE 
+						POST_SEQ IN ($POST_SEQ) 
+					GROUP BY POST_SEQ
+					) X2
+					ON X1.POST_SEQ = X2.POST_SEQ
+				ORDER BY X1.POST_SEQ DESC
+			</puts>
+		</sql>		
+
+<!-- listFollower4jqGrid -->
+		<sql name="myprofile.followerListTotalCnt" execute="Select" type="PreparedStatement" desc="follower 전체 수">
+			<puts>
+				SELECT
+					COUNT(*) 
+				FROM TB_FOLLOWER
+				WHERE ACCOUNTPK = :ACCOUNTPK
+			</puts>
+		</sql>
+		<sql name="myprofile.followerList4jqGrid" execute="Select" type="PreparedStatement" desc="follower 목록">
+			<param name="OFFSET" 			required="yes" 	desc="" />
+			<param name="ROWS" 				required="yes" 	desc="" />
+			<param name="ACCOUNTPK"			required="yes" 	desc="유저 시퀀스" />
+			<puts>
+				SELECT 
+					A.FOLLOWER_USER_SEQ AS ACCOUNTPK,
+					B.ID,
+					IFNULL(B.USER_NM,'') USER_NM,
+					B.PROF_PIC_NM,
+					B.AVATAR_CD
+				FROM 
+					TB_FOLLOWER A
+					INNER JOIN 
+					TB_USER B
+				WHERE A.FOLLOWER_USER_SEQ=B.ACCOUNTPK
+					AND A.ACCOUNTPK = $ACCOUNTPK
+				ORDER BY B.ID DESC
+				LIMIT $OFFSET, $ROWS
+			</puts>
+		</sql>
+		
+		<sql name="myprofile.starContFollowerListTotalCnt_StarCont" execute="Select" type="PreparedStatement" desc="follower 전체 수">
+			<puts>
+				SELECT
+					COUNT(*)
+				FROM
+					TB_STAR_CONT_FOLLOW
+				WHERE
+					STAR_CONT_SEQ = :STAR_CONT_SEQ
+			</puts>
+		</sql>
+		<sql name="myprofile.starContFollowerUserList4jqGrid_StarCont" execute="Select" type="PreparedStatement" desc="follower 목록">
+			<param name="OFFSET" 			required="yes" 	desc="" />
+			<param name="ROWS" 				required="yes" 	desc="" />
+			<param name="STAR_CONT_SEQ"		required="yes" 	desc="" />
+			<puts>
+				SELECT
+					GROUP_CONCAT(A.ACCOUNTPK) AS STR_ACCOUNTPK
+				FROM
+					(
+					SELECT 
+						ACCOUNTPK
+					FROM
+						TB_STAR_CONT_FOLLOW
+					WHERE
+						STAR_CONT_SEQ = $STAR_CONT_SEQ
+					ORDER BY STAR_CONT_FOLLOW_SEQ DESC
+					LIMIT $OFFSET, $ROWS
+					) A
+			</puts>
+		</sql>
+		<sql name="myprofile.followerListByUser_SNS" execute="Select" type="PreparedStatement" desc="follower 목록">
+			<param name="ACCOUNTPK"			required="yes" 	desc="유저 시퀀스" />
+			<puts>
+				SELECT
+					ACCOUNTPK,
+					ID,
+					IFNULL(USER_NM,'') USER_NM,
+					PROF_PIC_NM,
+					AVATAR_CD
+				FROM
+					TB_USER
+				WHERE ACCOUNTPK IN ($ACCOUNTPK)
+				ORDER BY FIELD(ACCOUNTPK, $ACCOUNTPK)
+			</puts>
+		</sql>
+
+<!-- listFollow4jqGrid -->
+		<sql name="myprofile.followListTotalCnt" execute="Select" type="PreparedStatement" desc="follow 전체 수">
+			<puts>
+				SELECT
+					COUNT(*) 
+				FROM TB_FOLLOW
+				WHERE ACCOUNTPK = :ACCOUNTPK
+			</puts>
+		</sql>		
+		<sql name="myprofile.followList4jqGrid" execute="Select" type="PreparedStatement" desc="follow 목록">
+			<param name="OFFSET" 			required="yes" 	desc="" />
+			<param name="ROWS" 				required="yes" 	desc="" />
+			<param name="ACCOUNTPK"			required="yes" 	desc="유저 시퀀스" />
+			<puts>
+				SELECT 
+					A.FOLLOW_USER_SEQ AS ACCOUNTPK,
+					B.ID,
+					IFNULL(B.USER_NM,'') USER_NM,
+					B.PROF_PIC_NM,
+					B.AVATAR_CD
+				FROM 
+					TB_FOLLOW A
+					INNER JOIN 
+					TB_USER B
+				WHERE A.FOLLOW_USER_SEQ=B.ACCOUNTPK
+					AND A.ACCOUNTPK = $ACCOUNTPK
+				ORDER BY B.ID DESC
+				LIMIT $OFFSET, $ROWS
+			</puts>
+		</sql>
+
+<!-- getUserInfo4Profile -->
+		<sql name="myprofile.getUserSmileCnt_Account" execute="Select" type="PreparedStatement" desc="">
+			<puts>
+				SELECT
+					SMILE_CNT,
+					SMILE_FREE_CNT,
+					HEART_CNT
+				FROM
+					TB_CURRENCY_INFO
+				WHERE
+					ACCOUNTPK = :ACCOUNTPK
+			</puts>
+		</sql>
+		<sql name="myprofile.getUserInfo_SNS" execute="Select" type="PreparedStatement" desc="프로필정보가져오기">
+			<puts>
+				SELECT
+					A.ID, 
+					IFNULL(A.USER_NM, '') USER_NM,
+					IFNULL(A.PROF_PIC_PATH,'') PROF_PIC_PATH,
+					IFNULL(A.PROF_PIC_NM,'profile_default.png') PROF_PIC_NM,
+					IFNULL(A.INTRODUCE,'') INTRODUCE,
+					IFNULL(A.URL, '') URL,
+					IFNULL(B.FOLLOW_CNT,0) FOLLOW_CNT,
+					IFNULL(B.FOLLOWER_CNT,0) FOLLOWER_CNT,
+					IFNULL(B.POST_CNT,0) POST_CNT,
+					IFNULL(A.AVATAR_CD,0) AVATAR_CD
+				FROM 
+					TB_USER A
+					LEFT OUTER JOIN 
+					TB_COUNTER B	
+					ON A.ACCOUNTPK = B.ACCOUNTPK
+				WHERE A.ACCOUNTPK = :ACCOUNTPK	
+			</puts>
+		</sql>		
+
+<!-- getProfilePost -->
+
+<!-- modMyProfileInfo -->
+		<sql name="myprofile.getInterestTag_Game" execute="Select" type="PreparedStatement" desc="">
+			<param name="TAG_CD" 			required="yes" 	desc="" />
+			<puts>
+				SELECT 
+					ID AS TAG_CD,
+					INTEREST_NM AS TAG_NM 
+				FROM 
+					<!--  B_INTEREST_STAR_CONT -->
+					B_INTEREST
+				WHERE ID IN ($TAG_CD)
+					AND GROUP_ID = 1
+			</puts>
+		</sql>
+		
+		<sql name="myprofile.modProfileYn_Game" execute="Select" type="PreparedStatement" desc="">
+			<param name="ACCOUNTPK"			required="yes" 	desc="유저 시퀀스" />
+			<puts>
+				UPDATE TB_USER SET PROFILE_YN = 1 
+				WHERE ACCOUNTPK = $ACCOUNTPK 
+			</puts>
+		</sql>		
+		
+		<sql name="myprofile.delInterestTag_SNS" execute="Update" type="PreparedStatement" desc="">
+			<param name="ACCOUNTPK"			required="yes" 	desc="유저 시퀀스" />
+			<puts>
+				DELETE FROM TB_INTEREST_TAG
+				WHERE ACCOUNTPK = $ACCOUNTPK 
+			</puts>
+		</sql>
+		<sql name="myprofile.delUserTag_SNS" execute="Update" type="PreparedStatement" desc="">
+			<param name="ACCOUNTPK"			required="yes" 	desc="유저 시퀀스" />
+			<puts>
+				DELETE FROM TB_USER_TAG
+				WHERE ACCOUNTPK = $ACCOUNTPK AND ID_YN = 0
+			</puts>
+		</sql>
+		<sql name="myprofile.regInterestTag_SNS" execute="Update" type="PreparedStatement" desc="">
+			<param name="ACCOUNTPK"			required="yes" 	desc="유저 시퀀스" />
+			<param name="TAG_CD"			required="yes" 	desc="" />
+			<param name="TAG_NM"			required="yes" 	desc="" />
+			<puts>
+				INSERT INTO TB_INTEREST_TAG
+					(ACCOUNTPK, TAG_CD, TAG_NM) 
+				VALUES
+					($ACCOUNTPK, $TAG_CD, '$TAG_NM')
+			</puts>
+		</sql>
+		<sql name="myprofile.regUserTag_SNS" execute="Update" type="PreparedStatement" desc="">
+			<param name="ACCOUNTPK"			required="yes" 	desc="유저 시퀀스" />
+			<param name="TAG_NM"			required="yes" 	desc="" />
+			<puts>
+				INSERT INTO TB_USER_TAG
+					(ACCOUNTPK, TAG_NM, ID_YN) 
+				VALUES
+					($ACCOUNTPK, '$TAG_NM', 0)
+				ON DUPLICATE KEY UPDATE ID_YN = 1
+			</puts>
+		</sql>
+		<sql name="myprofile.modUser_SNS" execute="Update" type="PreparedStatement" desc="">
+			<param name="ACCOUNTPK"			required="yes" 	desc="유저 시퀀스" />
+			<param name="USER_NM"			required="yes" 	desc="" />
+			<param name="URL"				required="yes" 	desc="" />
+			<param name="INTRODUCE"			required="yes" 	desc="" />
+			<param name="GENDER"			required="yes" 	desc="" />
+			<param name="PROF_PIC_NM"		required="no" 	desc="" />
+			<puts>
+				UPDATE TB_USER SET
+					STARCONT_EXIST_YN = STARCONT_EXIST_YN
+			</puts>
+			<puts>
+					,USER_NM = '$USER_NM'
+			</puts>
+			<puts>
+					,URL = '$URL'
+			</puts>
+			<puts>
+					,INTRODUCE = '$INTRODUCE'
+			</puts>
+			<puts>
+					,GENDER = $GENDER
+			</puts>
+			<puts>
+					,PROF_PIC_NM = '$PROF_PIC_NM'
+			</puts>
+			<puts>
+				WHERE
+					ACCOUNTPK = $ACCOUNTPK
+			</puts>
+		</sql>
+		
+		<sql name="myprofile.modGameDbUser_SNS" execute="Update" type="PreparedStatement" desc="">
+			<param name="ACCOUNTPK"			required="yes" 	desc="유저 시퀀스" />
+			<param name="INTRODUCE"			required="no" 	desc="" />
+			<param name="PROF_PIC_NM"		required="no" 	desc="" />
+			<puts>
+				UPDATE TB_SNS_USER_INFO SET MOD_TIME = NOW()
+			</puts>
+			<puts>
+					,INTRODUCE = '$INTRODUCE'
+			</puts>
+			<puts>
+					,PROF_PIC_NM = '$PROF_PIC_NM'
+			</puts>
+			<puts>
+				WHERE ACCOUNTPK = $ACCOUNTPK
+			</puts>
+		</sql>		
+
+<!-- getMyProfileInfo -->
+		<sql name="myprofile.getMyProfileInfo_SNS" execute="Select" type="PreparedStatement" desc="">
+			<param name="ACCOUNTPK" 			required="yes" 	desc="" />
+			<puts>
+				SELECT
+					IFNULL(USER_NM, '') AS USER_NM,
+					IFNULL(URL, '') AS URL,
+					IFNULL(INTRODUCE, '') AS INTRODUCE,
+					GENDER,
+					IFNULL(PROF_PIC_PATH, '') AS PROF_PIC_PATH,
+					IFNULL(PROF_PIC_NM, 'profile_default.png') AS PROF_PIC_NM
+				FROM
+					TB_USER
+				WHERE 
+					ACCOUNTPK = $ACCOUNTPK
+			</puts>
+		</sql>
+		<sql name="myprofile.getMyInterestTag_SNS" execute="Select" type="PreparedStatement" desc="">
+			<param name="ACCOUNTPK" 			required="yes" 	desc="" />
+			<puts>
+				SELECT
+					TAG_CD,
+					TAG_NM
+				FROM
+					TB_INTEREST_TAG
+				WHERE
+					ACCOUNTPK = $ACCOUNTPK
+			</puts>
+		</sql>	
+
+<!-- getSmileFree4jqGrid -->
+		<sql name="myprofile.getSmileFree_SNS" execute="Select" type="PreparedStatement" desc="">
+			<param name="ACCOUNTPK" 			required="yes" 	desc="" />
+			<puts>
+				SELECT
+					FRND_ACCOUNTPK,
+					POST_SEQ,
+					REG_TIME
+				FROM
+					TB_SMILE_HIST
+				WHERE
+					FRND_ACCOUNTPK = $ACCOUNTPK
+			</puts>
+		</sql>	
+
+</module>
+</sqlm>

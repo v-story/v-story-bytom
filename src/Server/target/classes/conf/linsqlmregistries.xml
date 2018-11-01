@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SqlManager>
+	<Registries>
+		<Registry name="user" active="true">
+			<Resource>/opt/www/webapps/funfactory-1.0/WEB-INF/classes/conf/sqlm/user.xml</Resource>
+		</Registry>
+		<Registry name="login" active="true">
+			<Resource>/opt/www/webapps/funfactory-1.0/WEB-INF/classes/conf/sqlm/login.xml</Resource>
+		</Registry>
+		<Registry name="gamelogin" active="true">
+				<Resource>/opt/www/webapps/funfactory-1.0/WEB-INF/classes/conf/sqlm/gamelogin.xml</Resource>
+		</Registry>			
+	</Registries>
+</SqlManager>

@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlm SYSTEM "http://10.95.26.153/dtd/sqlm_2_1.dtd" [
+]>
+<sqlm   ver="2.1">
+	<module name="user" desc="유저정보관리">
+	
+<!-- regUser -->
+		<sql name="user.idCheck" execute="Select" type="PreparedStatement" desc="ID 체크">
+			<param name="ID" 	required="yes" 	desc="" />
+			<puts>
+				SELECT 
+					COUNT(*) 
+				FROM 
+					TB_USER
+				WHERE ID = BINARY'$ID'
+			</puts>
+		</sql>	
+		<sql name="user.getLvlInfo" execute="Select" type="PreparedStatement" desc="레벨정보가져오기">
+			<param name="ACCOUNTPK" 	required="yes" 	desc="계정pK" />
+			<puts>
+				SELECT LV FROM TB_USER WHERE ACCOUNTPK = $ACCOUNTPK
+			</puts>
+		</sql>			
+		<sql name="user.regUser_Account" execute="Update" type="PreparedStatement" desc="유저 등록 - ACCOUNT DB">
+			<param name="ID"			required="yes" 	desc="" />
+			<param name="PASSWD"		required="yes" 	desc="" />
+			<puts>
+				INSERT INTO TB_USER
+					(ID, PASSWD)
+				VALUES
+					('$ID', '$PASSWD')
+			</puts>
+		</sql>	
+		<sql name="user.regUser_AccountCurrency" execute="Update" type="PreparedStatement" desc="유저 등록 - ACCOUNT DB">
+			<param name="ACCOUNTPK"		required="yes" 	desc="" />
+			<!--
+			<param name="STAR_CNT"		required="yes" 	desc="" />
+			<param name="GOLD_CNT"		required="yes" 	desc="" />
+			<param name="RUBY_CNT"		required="yes" 	desc="" />
+			<param name="HEART_CNT"		required="yes" 	desc="" />
+			<param name="SMILE_CNT"		required="yes" 	desc="" />
+			<param name="COIN_CNT"		required="yes" 	desc="" />
+			-->
+			<puts>
+				INSERT INTO TB_CURRENCY_INFO
+					(ACCOUNTPK)
+				VALUES
+					($ACCOUNTPK)
+			</puts>
+		</sql>	
+		<sql name="user.regUser_SNS" execute="Update" type="PreparedStatement" desc="유저 등록 - SNS DB">
+			<param name="ACCOUNTPK"			required="yes" 	desc="" />
+			<param name="ID"				required="yes" 	desc="" />
+			<param name="PASSWD"			required="yes" 	desc="" />
+			<param name="PHONE"				required="no" 	desc="" />
+			<param name="EMAIL"				required="no" 	desc="" />
+			<param name="BIRTHYEAR"			required="yes" 	desc="" />
+			<param name="BIRTHMONTH"		required="yes" 	desc="" />
+			<param name="BIRTHDAY"			required="yes" 	desc="" />
+			<param name="GENDER"			required="yes" 	desc="" />
+			<puts>
+				INSERT INTO TB_USER
+					(
+					ACCOUNTPK, 
+					ID, 
+					PASSWD, 
+					PHONE, 
+					EMAIL, 
+					BIRTHYEAR, 
+					BIRTHMONTH, 
+					BIRTHDAY, 
+					GENDER
+					)
+				VALUES
+					(
+					$ACCOUNTPK, 
+					'$ID', 
+					'$PASSWD', 
+					'$PHONE', 
+					'$EMAIL', 
+					$BIRTHYEAR, 
+					$BIRTHMONTH, 
+					$BIRTHDAY, 
+					$GENDER
+					)
+			</puts>
+		</sql>
+		<sql name="user.regUserTag_SNS" execute="Update" type="PreparedStatement" desc="">
+			<param name="ACCOUNTPK"		required="yes" 	desc="" />
+			<param name="TAG_NM"		required="yes" 	desc="" />
+			<puts>
+				INSERT INTO TB_USER_TAG
+					(ACCOUNTPK, TAG_NM)
+				VALUES
+					($ACCOUNTPK, '$TAG_NM')
+			</puts>
+		</sql>
+		<sql name="user.regUser_Game" execute="Update" type="PreparedStatement" desc="유저 등록 - GAME DB">
+			<param name="ACCOUNTPK"			required="yes" 	desc="계정PK" />
+			<param name="ID"				required="yes" 	desc="아이디" />
+			<param name="GENDER"			required="yes" 	desc="성별" />
+			<puts>
+				INSERT INTO TB_USER
+					(ACCOUNTPK,ID,GENDER)
+				VALUES
+					($ACCOUNTPK,'$ID',$GENDER)
+			</puts>
+		</sql>	
+		<sql name="user.regRoomMap_Game" execute="Update" type="PreparedStatement" desc="유저 Default RoomMap등록 - GAME DB">
+			<param name="ACCOUNTPK"		required="yes" 	desc="" />
+			<puts>
+				INSERT INTO TB_ROOM_MAP_INFO
+					(ACCOUNTPK)
+				VALUES
+					($ACCOUNTPK)
+			</puts>
+		</sql>
+		<sql name="user.regObjMap_Game" execute="Update" type="PreparedStatement" desc="유저 Default RoomMap등록 - GAME DB">
+			<param name="ACCOUNTPK"		required="yes" 	desc="" />
+			<puts>
+				INSERT INTO TB_OBJ_MAP_INFO
+				(ACCOUNTPK, SECTOR_IDX, CATE_ID, OBJ_ID, TILE_IDX, ROT_DIR, LAYER_IDX)
+				SELECT $ACCOUNTPK AS ACCOUNTPK, SECTOR_IDX, CATE_ID, OBJ_ID, TILE_IDX, ROT_DIR, LAYER_IDX FROM TB_OBJ_MAP_INFO_DEFAULT WHERE ROOM_TYPE = 1				
+			</puts>
+		</sql>
+
+<!-- regAvatarInterest -->
+		<sql name="user.modAvatar_Game" execute="Update" type="PreparedStatement" desc="유저 등록 - GAME DB">
+			<param name="ACCOUNTPK"			required="yes" 	desc="" />
+			<param name="AVATAR_CD"			required="yes" 	desc="" />
+			<puts>
+				UPDATE TB_USER SET
+					AVATAR_CD = $AVATAR_CD
+				WHERE ACCOUNTPK = $ACCOUNTPK
+			</puts>
+		</sql>
+		<sql name="user.regInterest_SNS" execute="Update" type="PreparedStatement" desc="유저 등록 - SNS DB">
+			<param name="ACCOUNTPK"			required="yes" 	desc="" />
+			<param name="TAG_CD"			required="yes" 	desc="" />
+			<param name="TAG_NM"			required="no" 	desc="" />
+			<puts>
+				INSERT INTO TB_INTEREST_TAG
+					(ACCOUNTPK, TAG_CD, TAG_NM)
+				VALUES
+					($ACCOUNTPK, $TAG_CD, '$TAG_NM')
+			</puts>
+		</sql>
+		
+		<sql name="user.regInterest_SNS2" execute="Update" type="PreparedStatement" desc="유저 등록 - SNS DB">
+			<puts>
+				INSERT INTO TB_INTEREST_TAG
+					(ACCOUNTPK, TAG_CD, TAG_NM)
+				VALUES
+					(:ACCOUNTPK, :TAG_CD, :TAG_NM)
+			</puts>
+		</sql>		
+		
+		<sql name="user.regAccountUser" execute="Update" type="PreparedStatement" desc="AccountDB 유저 등록">
+			<puts>
+				INSERT INTO TB_USER
+					(ID,PASSWD)
+				VALUES
+					(:ID,:PASSWD)
+			</puts>
+		</sql>	
+		<sql name="user.delAccountUser" execute="Update" type="PreparedStatement" desc="AccountDB 유저 삭제">
+			<puts>
+				DELETE FROM TB_USER
+				WHERE ACCOUNTPK = :ACCOUNTPK
+			</puts>
+		</sql>			
+		<sql name="user.regSnsUser" execute="Update" type="PreparedStatement" desc="SnsDB  유저 등록">
+			<puts>
+				INSERT INTO TB_USER
+					(ACCOUNTPK,ID,EMAIL,PHONE,BIRTHYEAR,BIRTHMONTH,BIRTHDAY,GENDER)
+				VALUES
+					(:ACCOUNTPK,:ID,:EMAIL,:PHONE,:BIRTHYEAR,:BIRTHMONTH,:BIRTHDAY,:GENDER)
+			</puts>
+		</sql>			
+		<sql name="user.delSnsUser" execute="Update" type="PreparedStatement" desc="AccountDB 유저 삭제">
+			<puts>
+				DELETE FROM TB_USER
+				WHERE ACCOUNTPK = :ACCOUNTPK
+			</puts>
+		</sql>			
+		<sql name="user.regGameUser" execute="Update" type="PreparedStatement" desc="GameDB 유저 등록">
+			<puts>
+				INSERT INTO TB_USER
+					(ACCOUNTPK,ID)
+				VALUES
+					(:ACCOUNTPK,:ID)
+			</puts>
+		</sql>
+		
+		<sql name="user.createAvatar" execute="Update" type="PreparedStatement" desc="아바타생성">
+			<puts>
+				UPDATE TB_USER SET AVATAR_CD = :AVATAR_CD  WHERE ACCOUNTPK = :ACCOUNTPK;
+			</puts>
+		</sql>
+		
+		
+	</module>
+</sqlm>

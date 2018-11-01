@@ -51,23 +51,23 @@ public class BytomController
 		post("/listBalance",(req, res) 			-> { return listBalance(req, res); } );		
 		
 		get("/getBalance",(req, res) 			-> { return getBalance(req, res); } );
-		get("/getBalance",(req, res) 			-> { return getBalance(req, res); } );			
+		post("/getBalance",(req, res) 			-> { return getBalance(req, res); } );			
 		
 
 		get("/listTransaction",(req, res) 		-> { return listTransaction(req, res); } );
-		get("/listTransaction",(req, res) 		-> { return listTransaction(req, res); } );
+		post("/listTransaction",(req, res) 		-> { return listTransaction(req, res); } );
 		
 		get("/getTransaction",(req, res) 		-> { return getTransaction(req, res); } );
-		get("/getTransaction",(req, res) 		-> { return getTransaction(req, res); } );	
+		post("/getTransaction",(req, res) 		-> { return getTransaction(req, res); } );	
 
 		get("/listSmileTransaction",(req, res) 	-> { return listSmileTransaction(req, res); } );
-		get("/listSmileTransaction",(req, res) 	-> { return listSmileTransaction(req, res); } );
+		post("/listSmileTransaction",(req, res) 	-> { return listSmileTransaction(req, res); } );
 		
 		get("/smileToBtmTransaction",(req, res) -> { return smileToBtmTransaction(req, res); } );
-		get("/smileToBtmTransaction",(req, res) -> { return smileToBtmTransaction(req, res); } );		
+		post("/smileToBtmTransaction",(req, res) -> { return smileToBtmTransaction(req, res); } );		
 		
 		get("/btmToSmileTransaction",(req, res) -> { return btmToSmileTransaction(req, res); } );
-		get("/btmToSmileTransaction",(req, res) -> { return btmToSmileTransaction(req, res); } );	
+		post("/btmToSmileTransaction",(req, res) -> { return btmToSmileTransaction(req, res); } );	
 		
 		post("/listUtxo",(req, res) 			-> { return listUtxo(req, res); } );		
 		get("/listUtxo",(req, res) 				-> { return listUtxo(req, res); } );

@@ -1,0 +1,1066 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlm SYSTEM "http://10.95.26.153/dtd/sqlm_2_1.dtd" [
+]>
+<sqlm   ver="2.1">
+	<module name="search" desc="SNS 검색">
+
+<!-- listSearchRecommendVideo -->
+		<sql name="search.recommendVideoPostTotalCnt_SNS" execute="Select" type="PreparedStatement" desc="">
+			<param name="ACCOUNTPK"			required="yes" 	desc="유저 시퀀스" />
+			<puts>
+				SELECT
+					COUNT(POST_SEQ) AS CNT
+				FROM
+					TB_POST_WEIGHT_VIDEO
+				WHERE
+					ACCOUNTPK NOT IN ($ACCOUNTPK)
+					AND VIDEO_CNT > 0
+			</puts>
+		</sql>
+		<sql name="search.pageRecommendVideoPostSeqList_SNS" execute="Select" type="PreparedStatement" desc="">
+			<param name="ACCOUNTPK"			required="yes" 	desc="유저 시퀀스" />
+			<param name="OFFSET" 			required="yes" 	desc="" />
+			<param name="ROWS" 				required="yes" 	desc="" />
+			<puts>
+				SELECT
+					GROUP_CONCAT(A.POST_SEQ) AS STR_POST_SEQ
+				FROM
+					(
+					SELECT
+						POST_SEQ
+					FROM
+						TB_POST_WEIGHT_VIDEO
+					WHERE
+						ACCOUNTPK NOT IN ($ACCOUNTPK)
+						AND VIDEO_CNT > 0
+					ORDER BY WEIGHT DESC
+					LIMIT $OFFSET, $ROWS
+					) A
+			</puts>
+		</sql>
+		<sql name="search.recommendVideoList_SNS" execute="Select" type="PreparedStatement" desc="">
+			<param name="POST_SEQ"			required="yes" 	desc="" />
+			<puts>
+				SELECT
+					B.ACCOUNTPK,
+					B.ID,
+					IFNULL(B.USER_NM, '') AS USER_NM,
+					B.PROF_PIC_NM,
+					A.POST_SEQ
+				FROM
+					(
+					SELECT
+						ACCOUNTPK,
+						POST_SEQ
+					FROM
+						TB_HOME_POST
+					WHERE
+						POST_SEQ IN ($POST_SEQ)
+					) A
+					LEFT OUTER JOIN
+					TB_USER B
+					ON A.ACCOUNTPK = B.ACCOUNTPK
+				ORDER BY FIELD(A.POST_SEQ, $POST_SEQ)
+			</puts>
+		</sql>
+
+<!-- listSearchRecommendPost -->
+		<sql name="search.recommendContentsPostTotalCnt_SNS" execute="Select" type="PreparedStatement" desc="">
+			<param name="ACCOUNTPK"			required="yes" 	desc="유저 시퀀스" />
+			<param name="TAG_CD"			required="yes" 	desc="" />
+			<puts>
+				SELECT
+					COUNT(B.HOME_SEQ) AS CNT
+				FROM
+					(
+					SELECT
+						ACCOUNTPK
+					FROM
+						TB_INTEREST_TAG
+					WHERE
+						TAG_CD IN ($TAG_CD)
+						AND ACCOUNTPK NOT IN ($ACCOUNTPK)
+					GROUP BY ACCOUNTPK
+					) A
+					INNER JOIN
+					TB_HOME_POST B
+					ON A.ACCOUNTPK = B.ACCOUNTPK					
+			</puts>
+		</sql>
+		<sql name="search.recommendContentsPostSeq_SNS" execute="Select" type="PreparedStatement" desc="">
+			<param name="ACCOUNTPK"			required="yes" 	desc="유저 시퀀스" />
+			<param name="TAG_CD"			required="yes" 	desc="" />
+			<param name="OFFSET" 			required="yes" 	desc="" />
+			<param name="ROWS" 				required="yes" 	desc="" />
+			<puts>
+				SELECT
+					GROUP_CONCAT(POST_SEQ)
+				FROM
+					(
+					SELECT
+						B.POST_SEQ
+					FROM
+						(
+						SELECT
+							ACCOUNTPK
+						FROM
+							TB_INTEREST_TAG
+						WHERE
+							TAG_CD IN ($TAG_CD)
+							AND ACCOUNTPK NOT IN ($ACCOUNTPK)
+						GROUP BY ACCOUNTPK
+						) A
+						INNER JOIN
+						TB_HOME_POST B
+						ON A.ACCOUNTPK = B.ACCOUNTPK
+					ORDER BY B.WEIGHT DESC
+					LIMIT $OFFSET, $ROWS
+					) X1
+				
+			</puts>
+		</sql>
+		<sql name="search.recommendContentsPost_SNS" execute="Select" type="PreparedStatement" desc="">
+			<param name="POST_SEQ"			required="yes" 	desc="" />
+			<puts>
+				SELECT
+					A.ACCOUNTPK,
+					A.POST_SEQ,
+					IFNULL(B.FILE_NM, '') AS FILE_NM,
+					IFNULL(B.FILE_TYPE, 0) AS FILE_TYPE,
+					A.PIC_CNT,
+					A.VIDEO_CNT
+				FROM
+					(
+					SELECT
+						*
+					FROM
+						TB_POST
+					WHERE
+						POST_SEQ IN ($POST_SEQ)
+					) A
+					LEFT OUTER JOIN
+					TB_FILE_INFO B
+					ON A.POST_SEQ = B.POST_SEQ AND B.FILE_NUM = 1				
+				ORDER BY FIELD(A.POST_SEQ, $POST_SEQ)
+			</puts>
+		</sql>
+		<sql name="search.recommendContentsPostTotalCntByAll_SNS" execute="Select" type="PreparedStatement" desc="">
+			<param name="ACCOUNTPK"			required="yes" 	desc="유저 시퀀스" />
+			<puts>
+				SELECT
+					COUNT(HOME_SEQ) AS CNT
+				FROM
+					TB_HOME_POST
+				WHERE
+					ACCOUNTPK NOT IN ($ACCOUNTPK)
+			</puts>
+		</sql>
+		<sql name="search.recommendContentsPostSeqByAll_SNS" execute="Select" type="PreparedStatement" desc="">
+			<param name="ACCOUNTPK"			required="yes" 	desc="유저 시퀀스" />
+			<param name="OFFSET" 			required="yes" 	desc="" />
+			<param name="ROWS" 				required="yes" 	desc="" />
+			<puts>
+				SELECT
+					GROUP_CONCAT(POST_SEQ)
+				FROM
+					(
+					SELECT
+						POST_SEQ
+					FROM
+						TB_HOME_POST
+					WHERE
+						ACCOUNTPK NOT IN ($ACCOUNTPK)
+					ORDER BY WEIGHT DESC
+					LIMIT $OFFSET, $ROWS
+					) X1
+			</puts>
+		</sql>
+		
+
+<!-- getSearchMyFavoriteVideo -->
+		<sql name="search.myFavoritePostSeq4IF1_SNS" execute="Select" type="PreparedStatement" desc="">
+			<param name="ACCOUNTPK"			required="yes" 	desc="유저 시퀀스" />
+			<puts>
+				SELECT
+					X1.ACCOUNTPK,
+					X2.POST_SEQ
+				FROM
+					(
+					SELECT
+						A.ACCOUNTPK
+					FROM
+						TB_INTEREST_TAG A
+						INNER JOIN
+						(
+						SELECT
+							TAG_CD
+						FROM
+							TB_INTEREST_TAG
+						WHERE
+							ACCOUNTPK = $ACCOUNTPK
+						) B
+						ON A.TAG_CD = B.TAG_CD
+					GROUP BY A.ACCOUNTPK
+					) X1
+					INNER JOIN
+					TB_HOME_POST X2
+					ON X1.ACCOUNTPK = X2.ACCOUNTPK AND X2.ACCOUNTPK NOT IN ($ACCOUNTPK) AND X2.VIDEO_EXIST_YN = 1
+				ORDER BY X2.WEIGHT DESC
+				LIMIT 1
+			</puts>
+		</sql>
+		<sql name="search.myFavoritePostSeq1_SNS" execute="Select" type="PreparedStatement" desc="">
+			<param name="ACCOUNTPK"			required="yes" 	desc="유저 시퀀스" />
+			<puts>
+				SELECT
+					ACCOUNTPK, POST_SEQ
+				FROM
+					TB_HOME_POST
+				WHERE 1=1
+					AND ACCOUNTPK NOT IN ($ACCOUNTPK)
+					AND VIDEO_EXIST_YN = 1						
+				ORDER BY WEIGHT DESC
+				LIMIT 0,1
+			</puts>
+		</sql>
+		<sql name="search.myFavoritePostSeq4IF2_SNS" execute="Select" type="PreparedStatement" desc="">
+			<param name="ACCOUNTPK"			required="yes" 	desc="유저 시퀀스" />
+			<puts>
+				SELECT
+					X1.ACCOUNTPK,
+					X2.POST_SEQ
+				FROM
+					(
+					SELECT
+						A.ACCOUNTPK
+					FROM
+						TB_INTEREST_TAG A
+						INNER JOIN
+						(
+						SELECT
+							TAG_CD
+						FROM
+							TB_INTEREST_TAG
+						WHERE
+							ACCOUNTPK = $ACCOUNTPK
+						) B
+						ON A.TAG_CD = B.TAG_CD
+					GROUP BY A.ACCOUNTPK
+					) X1
+					INNER JOIN
+					TB_HOME_POST X2
+					ON X1.ACCOUNTPK = X2.ACCOUNTPK AND X2.ACCOUNTPK NOT IN ($ACCOUNTPK) AND X2.PIC_EXIST_YN = 1
+				ORDER BY X2.WEIGHT DESC
+				LIMIT 1
+			</puts>
+		</sql>
+		<sql name="search.myFavoritePostSeq2_SNS" execute="Select" type="PreparedStatement" desc="">
+			<param name="ACCOUNTPK"			required="yes" 	desc="유저 시퀀스" />
+			<puts>
+				SELECT
+					ACCOUNTPK, POST_SEQ
+				FROM
+					TB_HOME_POST
+				WHERE 1=1
+					AND ACCOUNTPK NOT IN ($ACCOUNTPK)
+					AND PIC_EXIST_YN = 1						
+				ORDER BY WEIGHT DESC
+				LIMIT 0,1				
+			</puts>
+		</sql>
+		<sql name="search.myFavoritePostSeq4IF3_SNS" execute="Select" type="PreparedStatement" desc="">
+			<param name="ACCOUNTPK"			required="yes" 	desc="유저 시퀀스" />
+			<puts>
+				SELECT
+					X1.ACCOUNTPK,
+					X2.POST_SEQ
+				FROM
+					(
+					SELECT
+						A.ACCOUNTPK
+					FROM
+						TB_INTEREST_TAG A
+						INNER JOIN
+						(
+						SELECT
+							TAG_CD
+						FROM
+							TB_INTEREST_TAG
+						WHERE
+							ACCOUNTPK = $ACCOUNTPK
+						) B
+						ON A.TAG_CD = B.TAG_CD
+					GROUP BY A.ACCOUNTPK
+					) X1
+					INNER JOIN
+					TB_HOME_POST X2
+					ON X1.ACCOUNTPK = X2.ACCOUNTPK AND X2.ACCOUNTPK NOT IN ($ACCOUNTPK)
+				ORDER BY X2.WEIGHT DESC
+				LIMIT 1
+			</puts>
+		</sql>
+		<sql name="search.myFavoritePostSeq3_SNS" execute="Select" type="PreparedStatement" desc="">
+			<param name="ACCOUNTPK"			required="yes" 	desc="유저 시퀀스" />
+			<puts>
+				SELECT
+					ACCOUNTPK, POST_SEQ
+				FROM
+					TB_HOME_POST
+				WHERE 1=1
+					AND ACCOUNTPK NOT IN ($ACCOUNTPK)
+				ORDER BY WEIGHT DESC
+				LIMIT 0,1			
+			</puts>
+		</sql>
+		<sql name="search.myFavoritePost_SNS" execute="Select" type="PreparedStatement" desc="">
+			<param name="POST_SEQ"			required="yes" 	desc="" />
+			<puts>
+				SELECT
+					IFNULL(FILE_PATH, '') FILE_PATH,
+					FILE_NM,
+					FILE_TYPE
+				FROM
+					TB_FILE_INFO
+				WHERE
+					POST_SEQ = $POST_SEQ
+			</puts>
+			<puts>
+			<!-- 
+					AND FILE_TYPE = $FILE_TYPE
+				ORDER BY FILE_NUM ASC
+			-->
+				ORDER BY FILE_TYPE DESC, FILE_NUM ASC
+			</puts>
+			<puts>
+				LIMIT 0,1
+			</puts>
+		</sql>
+
+<!-- listSearchRecommendPostCont -->
+		<sql name="search.getRecommendPostUserInfo_SNS" execute="Select" type="PreparedStatement" desc="post_seq 기준으로 유저 정보 얻기">
+			<param name="POST_SEQ" 			required="yes" 	desc="" />
+			<puts>
+				SELECT
+					A.POST_SEQ, 
+					A.ACCOUNTPK, 
+					B.ID, 
+					IFNULL(B.PROF_PIC_NM, 'profile_default.png') AS PROF_PIC_NM
+				FROM
+					(
+					SELECT
+						POST_SEQ, ACCOUNTPK
+					FROM
+						TB_HOME_POST
+					WHERE 
+						POST_SEQ IN ($POST_SEQ)
+					) A
+					LEFT OUTER JOIN
+					TB_USER B
+					ON A.ACCOUNTPK = B.ACCOUNTPK			
+			</puts>
+		</sql>	
+		<sql name="search.getRecommendPostContSortWeight_SNS" execute="Select" type="PreparedStatement" desc="">
+			<param name="ACCOUNTPK"			required="yes" 	desc="유저 시퀀스" />
+			<param name="POST_SEQ" 			required="yes" 	desc="게시물  시퀀스" />
+			<puts>
+				SELECT
+					X1.*
+					,IFNULL(X2.FILE_NM_S, '') AS FILE_NM_S
+					,IFNULL(X2.FILE_TYPE_S, '') AS FILE_TYPE_S
+					,IF(X3.SMILE_SEQ IS NULL, 0, 1) AS SMILE
+					,IF(X4.HEART_SEQ IS NULL, 0, 1) AS HEART
+				FROM
+					(
+					SELECT
+						POST_SEQ,
+						WEIGHT,
+						CONT,
+						HEART_CNT,
+						SMILE_CNT,
+						COMMENT_CNT,
+						TIMESTAMPDIFF(HOUR, REG_TIME, NOW()) AS DIFF_TIME,
+						REG_TIME
+					FROM
+						TB_POST
+					WHERE 
+						POST_SEQ IN ($POST_SEQ)
+					) X1
+					LEFT OUTER JOIN
+					(
+					SELECT 
+						POST_SEQ, 
+						GROUP_CONCAT(FILE_NM ORDER BY FILE_NUM ASC) AS FILE_NM_S, 
+						GROUP_CONCAT(FILE_TYPE ORDER BY FILE_NUM ASC) AS FILE_TYPE_S 
+					FROM 
+						TB_FILE_INFO 
+					WHERE 
+						POST_SEQ IN ($POST_SEQ) 
+					GROUP BY POST_SEQ
+					) X2
+					ON X1.POST_SEQ = X2.POST_SEQ
+					LEFT OUTER JOIN
+					TB_SMILE_HIST X3
+					ON X1.POST_SEQ = X3.POST_SEQ AND X3.ACCOUNTPK = $ACCOUNTPK
+					LEFT OUTER JOIN
+					TB_HEART_HIST X4
+					ON X1.POST_SEQ = X4.POST_SEQ AND X4.ACCOUNTPK = $ACCOUNTPK
+				ORDER BY X1.WEIGHT DESC
+			</puts>
+		</sql>		
+		<sql name="search.getRecommendPostContSortTime_SNS" execute="Select" type="PreparedStatement" desc="">
+			<param name="ACCOUNTPK"			required="yes" 	desc="유저 시퀀스" />
+			<param name="POST_SEQ" 			required="yes" 	desc="게시물  시퀀스" />
+			<puts>
+				SELECT
+					X1.*
+					,IFNULL(X2.FILE_NM_S, '') AS FILE_NM_S
+					,IFNULL(X2.FILE_TYPE_S, '') AS FILE_TYPE_S
+					,IF(X3.SMILE_SEQ IS NULL, 0, 1) AS SMILE
+					,IF(X4.HEART_SEQ IS NULL, 0, 1) AS HEART
+				FROM
+					(
+					SELECT
+						POST_SEQ,
+						WEIGHT,
+						CONT,
+						HEART_CNT,
+						SMILE_CNT,
+						COMMENT_CNT,
+						TIMESTAMPDIFF(HOUR, REG_TIME, NOW()) AS DIFF_TIME,
+						REG_TIME
+					FROM
+						TB_POST
+					WHERE 
+						POST_SEQ IN ($POST_SEQ)
+					) X1
+					LEFT OUTER JOIN
+					(
+					SELECT 
+						POST_SEQ, 
+						GROUP_CONCAT(FILE_NM ORDER BY FILE_NUM ASC) AS FILE_NM_S, 
+						GROUP_CONCAT(FILE_TYPE ORDER BY FILE_NUM ASC) AS FILE_TYPE_S 
+					FROM 
+						TB_FILE_INFO 
+					WHERE 
+						POST_SEQ IN ($POST_SEQ) 
+					GROUP BY POST_SEQ
+					) X2
+					ON X1.POST_SEQ = X2.POST_SEQ
+					LEFT OUTER JOIN
+					TB_SMILE_HIST X3
+					ON X1.POST_SEQ = X3.POST_SEQ AND X3.ACCOUNTPK = $ACCOUNTPK
+					LEFT OUTER JOIN
+					TB_HEART_HIST X4
+					ON X1.POST_SEQ = X4.POST_SEQ AND X4.ACCOUNTPK = $ACCOUNTPK
+				ORDER BY X1.POST_SEQ DESC
+			</puts>
+		</sql>		
+
+<!-- listSearchRecommendFriend -->
+		<sql name="search.getInterestTagCd_SNS" execute="Select" type="PreparedStatement" desc="">
+			<param name="ACCOUNTPK"			required="yes" 	desc="유저 시퀀스" />
+			<puts>
+				SELECT
+					GROUP_CONCAT(TAG_CD) AS STR_TAG_CD
+				FROM
+					TB_INTEREST_TAG
+				WHERE
+					ACCOUNTPK = $ACCOUNTPK
+			</puts>
+		</sql>
+		<sql name="search.recommendFriendAccountpk_SNS" execute="Select" type="PreparedStatement" desc="추천 친구 ACCOUNTPK 스트링">
+			<param name="ACCOUNTPK"			required="yes" 	desc="유저 시퀀스" />
+			<param name="TAG_CD"			required="yes" 	desc="유저 시퀀스" />
+			<param name="OFFSET" 			required="yes" 	desc="" />
+			<param name="ROWS" 				required="yes" 	desc="" />
+			<puts>
+				SELECT
+					GROUP_CONCAT(Z1.ACCOUNTPK) AS STR_ACCOUNTPK
+				FROM
+					(
+					SELECT
+						Y1.ACCOUNTPK
+					FROM
+						(
+						SELECT
+							X1.ACCOUNTPK,
+							MAX(X1.POST_CNT) AS POST_CNT,
+							MAX(X1.FOLLOWER_CNT) AS FOLLOWER_CNT
+						FROM
+							(
+							SELECT
+								A.POST_CNT,
+								A.FOLLOWER_CNT,
+								B.ACCOUNTPK
+							FROM
+								TB_COUNTER A
+								INNER JOIN
+								(
+								SELECT
+									ACCOUNTPK
+								FROM
+									TB_INTEREST_TAG
+								WHERE
+									TAG_CD IN ($TAG_CD)
+									AND ACCOUNTPK NOT IN ($ACCOUNTPK)
+								) B
+								ON A.ACCOUNTPK = B.ACCOUNTPK
+							) X1
+						GROUP BY X1.ACCOUNTPK
+						) Y1
+					ORDER BY Y1.POST_CNT DESC, Y1.FOLLOWER_CNT DESC
+					LIMIT $OFFSET, $ROWS
+					) Z1
+
+			</puts>
+		</sql>
+		<sql name="search.recommendFriendAccountpkByAll_SNS" execute="Select" type="PreparedStatement" desc="추천 친구 ACCOUNTPK 스트링">
+			<param name="ACCOUNTPK"			required="yes" 	desc="유저 시퀀스" />
+			<param name="OFFSET" 			required="yes" 	desc="" />
+			<param name="ROWS" 				required="yes" 	desc="" />
+			<puts>
+				SELECT
+					GROUP_CONCAT(Z1.ACCOUNTPK) AS STR_ACCOUNTPK
+				FROM
+					(
+					SELECT
+						ACCOUNTPK
+					FROM
+						TB_COUNTER
+					WHERE
+						ACCOUNTPK NOT IN ($ACCOUNTPK)
+					ORDER BY POST_CNT DESC, FOLLOWER_CNT DESC
+					LIMIT $OFFSET, $ROWS
+					) Z1
+
+			</puts>
+		</sql>
+		
+		<sql name="search.recommendFriendList_SNS" execute="Select" type="PreparedStatement" desc="">
+			<param name="ACCOUNTPK"			required="yes" 	desc="유저 시퀀스" />
+			<puts>
+				SELECT
+					A.ACCOUNTPK,
+					A.ID,
+					IFNULL(A.USER_NM, '') AS USER_NM,
+					A.PROF_PIC_NM,
+					B.POST_CNT
+				FROM
+					TB_USER A
+					INNER JOIN 
+					TB_COUNTER B
+					ON A.ACCOUNTPK IN ($ACCOUNTPK) AND A.ACCOUNTPK = B.ACCOUNTPK
+				ORDER BY B.POST_CNT DESC, B.FOLLOWER_CNT DESC
+				<!--
+				ORDER BY RAND()
+				LIMIT $OFFSET, $ROWS
+				-->
+			</puts>
+		</sql>
+		<sql name="search.recommendFriendList2_SNS" execute="Select" type="PreparedStatement" desc="">
+			<param name="ACCOUNTPK"			required="yes" 	desc="유저 시퀀스" />
+			<param name="OFFSET" 			required="yes" 	desc="" />
+			<param name="ROWS" 				required="yes" 	desc="" />
+			<puts>
+				SELECT
+					B.ACCOUNTPK,
+					B.ID,
+					IFNULL(B.USER_NM, '') AS USER_NM,
+					B.PROF_PIC_NM,
+					A.POST_CNT
+				FROM
+					(
+					SELECT
+						ACCOUNTPK,
+						POST_CNT
+					FROM
+						TB_COUNTER
+					WHERE
+						ACCOUNTPK NOT IN ($ACCOUNTPK)
+					ORDER BY POST_CNT DESC, FOLLOWER_CNT DESC
+					LIMIT $OFFSET, $ROWS
+					) A
+					LEFT OUTER JOIN
+					TB_USER B
+					ON A.ACCOUNTPK = B.ACCOUNTPK
+			</puts>
+		</sql>
+
+<!-- listSearchRecommendTag -->
+		<sql name="search.recommendTagListTotalCnt_SNS" execute="Select" type="PreparedStatement" desc="">
+			<param name="ACCOUNTPK"			required="yes" 	desc="유저 시퀀스" />
+			<puts>
+				SELECT
+					COUNT(A.TAG_SEQ) CNT
+				FROM
+					(
+					SELECT
+						TAG_SEQ
+					FROM
+						TB_TAG_POST
+					WHERE
+						ACCOUNTPK NOT IN ($ACCOUNTPK)
+					GROUP BY TAG_SEQ
+					) A			
+			</puts>
+		</sql>
+		<sql name="search.recommendTagSeq_SNS" execute="Select" type="PreparedStatement" desc="">
+			<param name="ACCOUNTPK"			required="yes" 	desc="유저 시퀀스" />
+			<param name="OFFSET" 			required="yes" 	desc="" />
+			<param name="ROWS" 				required="yes" 	desc="" />
+			<puts>
+				<!--
+				SELECT
+					GROUP_CONCAT(A.TAG_SEQ) AS STR_TAG_SEQ
+				FROM
+					(
+					SELECT
+						TAG_SEQ
+					FROM
+						TB_TAG_POST
+					WHERE
+						ACCOUNTPK NOT IN ($ACCOUNTPK)
+					GROUP BY TAG_SEQ
+					ORDER BY RAND()
+					LIMIT $OFFSET, $ROWS
+					) A
+				-->
+				SELECT
+					GROUP_CONCAT(X1.TAG_SEQ) AS STR_TAG_SEQ
+				FROM
+					(
+					SELECT
+						A.TAG_SEQ
+					FROM
+						(
+						SELECT
+							TAG_SEQ
+						FROM
+							TB_TAG_POST
+						WHERE
+							ACCOUNTPK NOT IN ($ACCOUNTPK)
+						GROUP BY TAG_SEQ
+						) A
+						INNER JOIN
+						TB_TAG B
+						ON A.TAG_SEQ = B.TAG_SEQ
+					ORDER BY B.POST_CNT DESC
+					LIMIT $OFFSET, $ROWS
+					) X1				
+			</puts>
+		</sql>
+		<sql name="search.recommendTagList_SNS" execute="Select" type="PreparedStatement" desc="">
+			<param name="TAG_SEQ"			required="yes" 	desc="유저 시퀀스" />
+			<puts>
+				SELECT
+					TAG_SEQ,
+					TAG_NM,
+					POST_CNT
+				FROM
+					TB_TAG
+				WHERE
+					TAG_SEQ IN ($TAG_SEQ)
+				ORDER BY POST_CNT DESC
+			</puts>
+		</sql>
+
+<!-- listSearchRecommendByFriend -->
+		<sql name="search.recommendByFriendTotalCnt_SNS" execute="Select" type="PreparedStatement" desc="">
+			<param name="ACCOUNTPK"		required="yes" 	desc="유저 시퀀스" />
+			<param name="TAG_NM"		required="yes" 	desc="유저 시퀀스" />
+			<puts>
+				SELECT
+					COUNT(ACCOUNTPK) CNT
+				FROM
+					TB_USER_TAG
+				WHERE 1=1
+					AND TAG_NM LIKE '$TAG_NM%'
+					AND ACCOUNTPK NOT IN ($ACCOUNTPK)
+			</puts>
+		</sql>
+		<sql name="search.recommendByFriend_SNS" execute="Select" type="PreparedStatement" desc="">
+			<param name="ACCOUNTPK"		required="yes" 	desc="유저 시퀀스" />
+			<param name="TAG_NM"		required="yes" 	desc="유저 시퀀스" />
+			<param name="OFFSET" 			required="yes" 	desc="" />
+			<param name="ROWS" 				required="yes" 	desc="" />
+			<puts>
+				SELECT
+					X1.*,
+					X2.POST_CNT
+				FROM
+					(
+					SELECT
+						A.*,
+						B.ID,
+						IFNULL(B.USER_NM, '') AS USER_NM,
+						B.PROF_PIC_NM
+					FROM
+						(
+						SELECT
+							ACCOUNTPK
+							<!-- ,TAG_NM -->
+						FROM
+							TB_USER_TAG
+						WHERE 1=1
+							AND TAG_NM LIKE '$TAG_NM%'
+							AND ACCOUNTPK NOT IN ($ACCOUNTPK)
+						) A
+						INNER JOIN
+						TB_USER B
+						ON A.ACCOUNTPK = B.ACCOUNTPK
+					ORDER BY A.ACCOUNTPK DESC
+					LIMIT $OFFSET, $ROWS
+					) X1
+					INNER JOIN
+					TB_COUNTER X2
+					ON X1.ACCOUNTPK = X2.ACCOUNTPK
+			</puts>
+		</sql>
+
+<!-- listSearchRecommendByTag -->
+		<sql name="search.recommendByTagTotalCnt_SNS" execute="Select" type="PreparedStatement" desc="">
+			<param name="TAG_NM"		required="yes" 	desc="유저 시퀀스" />
+			<puts>
+				SELECT
+					COUNT(TAG_SEQ) CNT
+				FROM
+					TB_TAG
+				WHERE 1=1
+					AND TAG_NM LIKE '$TAG_NM%'
+			</puts>
+		</sql>
+		<sql name="search.recommendByTag_SNS" execute="Select" type="PreparedStatement" desc="">
+			<param name="TAG_NM"		required="yes" 	desc="유저 시퀀스" />
+			<param name="OFFSET" 			required="yes" 	desc="" />
+			<param name="ROWS" 				required="yes" 	desc="" />
+			<puts>
+				SELECT
+					TAG_SEQ,
+					TAG_NM,
+					POST_CNT
+				FROM
+					TB_TAG
+				WHERE 1=1
+					AND TAG_NM LIKE '$TAG_NM%'
+				ORDER BY POST_CNT DESC
+				LIMIT $OFFSET, $ROWS
+			</puts>
+		</sql>
+
+<!-- listTagPopularPost -->
+		<sql name="search.tagPopularPostTotalCnt_SNS" execute="Select" type="PreparedStatement" desc="">
+			<param name="TAG_SEQ"		required="yes" 	desc="" />
+			<puts>
+				SELECT
+					COUNT(B.POST_SEQ) AS CNT
+				FROM
+					(
+					SELECT
+						ACCOUNTPK,
+						POST_SEQ
+					FROM
+						TB_TAG_POST
+					WHERE 1=1
+						AND TAG_SEQ = $TAG_SEQ
+					) A
+					INNER JOIN
+					TB_POST B
+					ON A.POST_SEQ = B.POST_SEQ
+			</puts>
+		</sql>
+		<sql name="search.tagPopularPost_SNS" execute="Select" type="PreparedStatement" desc="">
+			<param name="TAG_SEQ"		required="yes" 	desc="" />
+			<param name="OFFSET" 			required="yes" 	desc="" />
+			<param name="ROWS" 				required="yes" 	desc="" />
+			<puts>
+				SELECT
+					A.ACCOUNTPK,
+					B.POST_SEQ,
+					IFNULL(C.FILE_NM, '') AS FILE_NM,
+					IFNULL(C.FILE_TYPE, 0) AS FILE_TYPE,
+					B.PIC_CNT,
+					B.VIDEO_CNT
+				FROM
+					(
+					SELECT
+						ACCOUNTPK,
+						POST_SEQ
+					FROM
+						TB_TAG_POST
+					WHERE 1=1
+						AND TAG_SEQ = $TAG_SEQ
+					) A
+					INNER JOIN
+					TB_POST B
+					ON A.POST_SEQ = B.POST_SEQ
+					LEFT OUTER JOIN
+					TB_FILE_INFO C
+					ON B.POST_SEQ = C.POST_SEQ AND FILE_NUM = 1	
+				<!-- ORDER BY B.HEART_CNT DESC, B.SMILE_CNT DESC, B.COMMENT_CNT DESC -->
+				ORDER BY B.WEIGHT DESC
+				LIMIT $OFFSET, $ROWS
+			</puts>
+		</sql>
+
+<!-- listTagResentPost -->
+		<sql name="search.tagResentPostTotalCnt_SNS" execute="Select" type="PreparedStatement" desc="">
+			<param name="TAG_SEQ"		required="yes" 	desc="" />
+			<puts>
+				SELECT
+					COUNT(B.POST_SEQ) AS CNT
+				FROM
+					(
+					SELECT
+						ACCOUNTPK,
+						POST_SEQ
+					FROM
+						TB_TAG_POST
+					WHERE 1=1
+						AND TAG_SEQ = $TAG_SEQ
+					) A
+					INNER JOIN
+					TB_POST B
+					ON A.POST_SEQ = B.POST_SEQ
+			</puts>
+		</sql>
+		<sql name="search.tagResentPost_SNS" execute="Select" type="PreparedStatement" desc="">
+			<param name="TAG_SEQ"			required="yes" 	desc="" />
+			<param name="OFFSET" 			required="yes" 	desc="" />
+			<param name="ROWS" 				required="yes" 	desc="" />
+			<puts>
+				SELECT
+					A.ACCOUNTPK,
+					B.POST_SEQ,
+					IFNULL(C.FILE_NM, '') AS FILE_NM,
+					IFNULL(C.FILE_TYPE, 0) AS FILE_TYPE,
+					B.PIC_CNT,
+					B.VIDEO_CNT
+				FROM
+					(
+					SELECT
+						ACCOUNTPK,
+						POST_SEQ
+					FROM
+						TB_TAG_POST
+					WHERE 1=1
+						AND TAG_SEQ = $TAG_SEQ
+					) A
+					INNER JOIN
+					TB_POST B
+					ON A.POST_SEQ = B.POST_SEQ
+					LEFT OUTER JOIN
+					TB_FILE_INFO C
+					ON B.POST_SEQ = C.POST_SEQ AND FILE_NUM = 1	
+				ORDER BY B.REG_TIME DESC
+				LIMIT $OFFSET, $ROWS
+			</puts>
+		</sql>
+
+<!-- setSearchFriendHist -->
+		<sql name="search.addModSearchFrndHist_SNS" execute="Update" type="PreparedStatement" desc="">
+			<param name="ACCOUNTPK"			required="yes" 	desc="유저 시퀀스" />
+			<param name="FRND_ACCOUNTPK"	required="yes" 	desc="친구 유저 시퀀스" />
+			<puts>
+				INSERT INTO TB_SEARCH_FRND_HIST (ACCOUNTPK, FRND_ACCOUNTPK) VALUES ($ACCOUNTPK, $FRND_ACCOUNTPK)  
+				ON DUPLICATE KEY UPDATE LAST_TIME = NOW(); 
+			</puts>
+		</sql>
+
+<!-- setSearchTagHist -->
+		<sql name="search.addModSearchTagHist_SNS" execute="Update" type="PreparedStatement" desc="">
+			<param name="ACCOUNTPK"		required="yes" 	desc="유저 시퀀스" />
+			<param name="TAG_SEQ"		required="yes" 	desc="" />
+			<puts>
+				INSERT INTO TB_SEARCH_TAG_HIST (ACCOUNTPK, TAG_SEQ) VALUES ($ACCOUNTPK, $TAG_SEQ)  
+				ON DUPLICATE KEY UPDATE LAST_TIME = NOW(); 
+			</puts>
+		</sql>
+
+<!-- listSearchResentFriend -->
+		<sql name="search.searchResentFriendTotalCnt_SNS" execute="Select" type="PreparedStatement" desc="">
+			<param name="ACCOUNTPK"		required="yes" 	desc="유저 시퀀스" />
+			<puts>
+				SELECT
+					COUNT(SEARCH_SEQ) AS CNT
+				FROM
+					TB_SEARCH_FRND_HIST
+				WHERE
+					ACCOUNTPK = $ACCOUNTPK
+			</puts>
+		</sql>
+		<sql name="search.searchResentFriend_SNS" execute="Select" type="PreparedStatement" desc="">
+			<param name="ACCOUNTPK"		required="yes" 	desc="유저 시퀀스" />
+			<param name="OFFSET" 		required="yes" 	desc="" />
+			<param name="ROWS" 			required="yes" 	desc="" />
+			<puts>
+				SELECT
+					A.ACCOUNTPK,
+					C.ID,
+					C.USER_NM,
+					IFNULL(C.PROF_PIC_NM, '') AS PROF_PIC_NM,
+					B.POST_CNT
+				FROM
+					(
+					SELECT
+						FRND_ACCOUNTPK AS ACCOUNTPK
+						<!-- 
+						,ID
+						,USER_NM
+						,PROF_PIC_NM
+						-->
+					FROM
+						TB_SEARCH_FRND_HIST
+					WHERE
+						ACCOUNTPK = $ACCOUNTPK
+					ORDER BY LAST_TIME DESC
+					LIMIT $OFFSET, $ROWS
+					) A
+					LEFT OUTER JOIN
+					TB_COUNTER B
+					ON A.ACCOUNTPK = B.ACCOUNTPK
+					LEFT OUTER JOIN
+					TB_USER C
+					ON A.ACCOUNTPK = C.ACCOUNTPK
+			</puts>
+		</sql>
+
+<!-- listSearchResentTag -->
+		<sql name="search.SearchResentTagTotalCnt_SNS" execute="Select" type="PreparedStatement" desc="">
+			<param name="ACCOUNTPK"		required="yes" 	desc="유저 시퀀스" />
+			<puts>
+				SELECT
+					COUNT(SEARCH_SEQ) AS CNT
+				FROM
+					TB_SEARCH_TAG_HIST
+				WHERE
+					ACCOUNTPK = $ACCOUNTPK
+			</puts>
+		</sql>
+		<sql name="search.pageSearchResentTagSeq_SNS" execute="Select" type="PreparedStatement" desc="">
+			<param name="ACCOUNTPK" 		required="yes" 	desc="" />
+			<param name="OFFSET" 			required="yes" 	desc="" />
+			<param name="ROWS" 				required="yes" 	desc="" />
+			<puts>
+				SELECT
+					GROUP_CONCAT(A.TAG_SEQ) AS STR_TAG_SEQ					
+				FROM
+					(
+					SELECT
+						TAG_SEQ					
+					FROM
+						TB_SEARCH_TAG_HIST
+					WHERE
+						ACCOUNTPK = $ACCOUNTPK
+					ORDER BY LAST_TIME DESC
+					LIMIT $OFFSET, $ROWS
+					) A
+			</puts>
+		</sql>
+		<sql name="search.searchResentTag_SNS" execute="Select" type="PreparedStatement" desc="">
+			<param name="TAG_SEQ" 		required="yes" 	desc="" />
+			<puts>
+				SELECT
+					TAG_SEQ,
+					TAG_NM,
+					POST_CNT
+				FROM
+					TB_TAG
+				WHERE
+					TAG_SEQ IN ($TAG_SEQ)
+				ORDER BY FIELD(TAG_SEQ, $TAG_SEQ)
+			</puts>
+		</sql>
+
+<!-- listTagPopularPostCont -->
+		<sql name="search.tagPostContTotalCnt_SNS" execute="Select" type="PreparedStatement" desc="">
+			<param name="TAG_SEQ"			required="yes" 	desc="" />
+			<puts>
+				SELECT
+					COUNT(B.POST_SEQ) AS CNT
+				FROM
+					(
+					SELECT
+						ACCOUNTPK,
+						POST_SEQ
+					FROM
+						TB_TAG_POST
+					WHERE 1=1
+ 						AND TAG_SEQ = $TAG_SEQ
+					) A
+					INNER JOIN
+					TB_POST B
+					ON A.POST_SEQ = B.POST_SEQ
+			</puts>
+		</sql>
+		<sql name="search.pageTagPopularPostSeq_SNS" execute="Select" type="PreparedStatement" desc="">
+			<param name="TAG_SEQ"			required="yes" 	desc="" />
+			<param name="OFFSET" 			required="yes" 	desc="" />
+			<param name="ROWS" 				required="yes" 	desc="" />
+			<puts>
+				SELECT
+					GROUP_CONCAT(A.POST_SEQ) AS STR_POST_SEQ
+				FROM
+					(
+					SELECT
+						B.POST_SEQ
+					FROM
+						(
+						SELECT
+							ACCOUNTPK,
+							POST_SEQ
+						FROM
+							TB_TAG_POST
+						WHERE 1=1
+ 							AND TAG_SEQ = $TAG_SEQ
+						) A
+						INNER JOIN
+						TB_POST B
+						ON A.POST_SEQ = B.POST_SEQ
+					<!--  ORDER BY B.HEART_CNT DESC, B.SMILE_CNT DESC, B.COMMENT_CNT DESC -->
+					ORDER BY B.WEIGHT DESC
+					LIMIT $OFFSET, $ROWS
+					) A
+			</puts>
+		</sql>
+		
+<!-- listTagResentPostCont -->		
+		<sql name="search.pageTagResentPostSeq_SNS" execute="Select" type="PreparedStatement" desc="">
+			<param name="TAG_SEQ"			required="yes" 	desc="" />
+			<param name="OFFSET" 			required="yes" 	desc="" />
+			<param name="ROWS" 				required="yes" 	desc="" />
+			<puts>
+				SELECT
+					GROUP_CONCAT(A.POST_SEQ) AS STR_POST_SEQ
+				FROM
+					(
+					SELECT
+						B.POST_SEQ
+					FROM
+						(
+						SELECT
+							ACCOUNTPK,
+							POST_SEQ
+						FROM
+							TB_TAG_POST
+						WHERE 1=1
+ 	 						AND TAG_SEQ = $TAG_SEQ
+						) A
+						INNER JOIN
+						TB_POST B
+						ON A.POST_SEQ = B.POST_SEQ
+					ORDER BY B.REG_TIME DESC
+					LIMIT $OFFSET, $ROWS
+					) A
+			</puts>
+		</sql>
+
+		<sql name="search.getTagSeq_SNS" execute="Select" type="PreparedStatement" desc="">
+			<param name="TAG_NM"			required="yes" 	desc="" />
+			<puts>
+				SELECT TAG_SEQ FROM TB_TAG WHERE TAG_NM = '$TAG_NM'
+			</puts>
+		</sql>
+
+
+	</module>
+</sqlm>

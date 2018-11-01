@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlm SYSTEM "http://10.95.26.153/dtd/sqlm_2_1.dtd" [
+]>
+<sqlm   ver="2.1">
+	<module name="base" desc="베이스정보">
+	
+		<sql name="base.objectinfo" execute="Select" type="PreparedStatement" desc="오브젝트정보 가져오기">
+			<puts>
+				SELECT 
+					*
+				FROM B_OBJ	
+			</puts>
+		</sql>			
+	
+		<sql name="base.objectActioninfo" execute="Select" type="PreparedStatement" desc="오브젝트액션정보 가져오기">
+			<puts>
+				SELECT 
+					*
+				FROM B_OBJ_ACTN	
+			</puts>
+		</sql>			
+
+		<sql name="base.categoryinfo" execute="Select" type="PreparedStatement" desc="카테고리 가져오기">
+			<puts>
+				SELECT 
+					SEQ,CATE_ID,MAX_CNT
+				FROM B_OBJ_CATE	
+			</puts>
+		</sql>			
+
+		<sql name="base.costinfo" execute="Select" type="PreparedStatement" desc="비용 가져오기">
+			<puts>
+				SELECT
+				    SEQ,COST_ID,ITEM_ID,ITEM_CNT
+				FROM B_COST 
+			</puts>
+		</sql>	
+		
+		<sql name="base.snsQuestinfo" execute="Select" type="PreparedStatement" desc="쇼셜퀘스트 가져오기">
+			<puts>
+				SELECT
+				    SEQ,QUESTCOND,RESET_ITEM_ID,RESET_ITEM_CNT,OPEN_ITEM_ID,OPEN_ITEM_CNT,RWD_ITEM_ID,RWD_ITEM_CNT,
+				    RWD_ITEM_ID2,RWD_ITEM_CNT2,RWD_ITEM_ID3,RWD_ITEM_CNT3,RWD_ITEM_ID4,RWD_ITEM_CNT4,
+				    3COMBO_RWD_ITEM_ID AS COMBO6_RWD_ITEM_ID,3COMBO_RWD_ITEM_CNT AS COMBO3_RWD_ITEM_CNT,
+				    6COMBO_RWD_ITEM_ID AS COMBO6_RWD_ITEM_ID,6COMBO_RWD_ITEM_CNT AS COMBO6_RWD_ITEM_CNT
+				FROM B_SNSQUEST 
+			</puts>
+		</sql>		
+		
+		<sql name="base.levelexpinfo" execute="Select" type="PreparedStatement" desc="레벨경험치 가져오기">
+			<puts>
+				SELECT
+				    SEQ,LV,COMPLEMENT,NEED_EXP,ACM_EXP,ITEM_ID1,ITEM_QNT1, 
+				    ITEM_ID2,ITEM_QNT2,ITEM_ID3,ITEM_QNT3
+				FROM B_LV_EXP_RWD 
+			</puts>
+		</sql>
+		
+		<sql name="base.interestinfo" execute="Select" type="PreparedStatement" desc="관심분야 가져오기">
+			<puts>
+				SELECT
+				    *
+				FROM B_INTEREST 
+			</puts>
+		</sql>	
+
+		<sql name="base.starcontentsinterestinfo" execute="Select" type="PreparedStatement" desc="스타콘텐츠 관심분야 가져오기">
+			<puts>
+				SELECT
+				    *
+				FROM B_INTEREST_STAR_CONT 
+			</puts>
+		</sql>	
+		
+		<sql name="base.pollinfo" execute="Select" type="PreparedStatement" desc="todo 해야할일">
+			<puts>
+				SELECT
+					SEQ,
+			        POLL_NAME,
+			        TENDENCY,
+			        TIMESTAMPDIFF( SECOND, NOW(), START_DATE) AS NEXTSTARTTIME,
+			        TIMESTAMPDIFF( SECOND, NOW(), END_DATE) AS NEXTENDTIME,
+			        RWD_ITEM_ID1,
+			        RWD_ITEM_ID2,
+			        RWD_ITEM_ID3,
+			        RWD_ITEM_ID4,
+			        RWD_ITEM_ID5,
+			        RWD_ITEM_CNT1,
+			        RWD_ITEM_CNT2,
+			        RWD_ITEM_CNT3,
+			        RWD_ITEM_CNT4,
+			        RWD_ITEM_CNT5
+				FROM B_POLL 
+			    WHERE END_DATE &gt; NOW();  
+			</puts>
+		</sql>	
+		
+		<sql name="base.dailytodoinfo" execute="Select" type="PreparedStatement" desc="todo 해야할일">
+			<puts>
+				SELECT
+			        QUEST_ID,QUEST_COND,QUEST_COND_VALUE,QUEST_CNT,
+			        RWD_ITEM_ID1,RWD_ITEM_ID2,RWD_ITEM_CNT1,RWD_ITEM_CNT2
+				FROM B_DAY_TODO  
+			</puts>
+		</sql>		
+		
+		<sql name="base.interactiveinfo" execute="Select" type="PreparedStatement" desc="채널상호작용">
+			<puts>
+				SELECT
+				    INTERACTIVE_ID,COST_TIME,INTERACTIVE_EXP	
+				FROM B_INTERACTIVE  
+			</puts>
+		</sql>				
+		
+
+	</module>
+</sqlm>

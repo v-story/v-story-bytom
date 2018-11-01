@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlm SYSTEM "http://10.95.26.153/dtd/sqlm_2_1.dtd" [
+]>
+<sqlm   ver="2.1">
+	<module name="guestlogin" desc="유저정보관리">
+		<sql name="guestlogin.getUserInfo" execute="Select" type="PreparedStatement" desc="사용자 정보 가져오기">
+			<param name="ACCOUNTPK"			required="yes" 	desc="유저 시퀀스" />
+			<puts>
+				SELECT 
+					A.ACCOUNTPK,
+					A.ID AS ACCOUNTID,
+					A.AVATAR_CD,
+					A.GENDER,
+					A.EXP,
+					A.LV,
+					A.ROOM_TYPE,
+					B.PROF_PIC_NM
+				FROM
+				(
+					SELECT 
+						ACCOUNTPK,ID,AVATAR_CD,GENDER,EXP,LV,ROOM_TYPE
+					FROM TB_USER A
+					WHERE ACCOUNTPK = $ACCOUNTPK
+				) A LEFT OUTER JOIN TB_SNS_USER_INFO B
+				ON A.ACCOUNTPK=B.ACCOUNTPK						
+			</puts>
+		</sql>			
+		
+		<sql name="guestlogin.getCurrencyInfo" execute="Select" type="PreparedStatement" desc="사용자 정보 가져오기">
+			<param name="ACCOUNTPK"			required="yes" 	desc="유저 시퀀스" />
+			<puts>
+				SELECT
+				    STAR_CNT,
+				    GOLD_CNT,
+				    RUBY_CNT,
+				    HEART_CNT,
+				    COIN_CNT,
+				    SMILE_CNT,
+				    RUBY_FREE_CNT,
+				    SMILE_FREE_CNT
+				FROM  TB_CURRENCY_INFO 
+				WHERE ACCOUNTPK = $ACCOUNTPK
+			</puts>
+		</sql>	
+
+		<sql name="guestlogin.getRoomMapInfo" execute="Select" type="PreparedStatement" desc="룸맵정보 가져오기">
+			<param name="ACCOUNTPK"			required="yes" 	desc="유저 시퀀스" />
+			<puts>
+				SELECT 
+					A.ROOM_MAP_SEQ,
+					B.ROOM_TYPE,
+					A.ROOM_TILE_CNT,
+					A.ROOM_INFO
+				FROM
+				(	
+					SELECT ACCOUNTPK,ROOM_MAP_SEQ , ROOM_TILE_CNT ,ROOM_INFO 
+					FROM TB_ROOM_MAP_INFO 
+					WHERE ACCOUNTPK = $ACCOUNTPK
+				) A INNER JOIN TB_USER B
+				ON A.ACCOUNTPK = B.ACCOUNTPK					
+			</puts>
+		</sql>	
+		
+		<sql name="guestlogin.getObjectMapList" execute="Select" type="PreparedStatement" desc="오브젝트맵 가져오기">
+			<param name="ACCOUNTPK"			required="yes" 	desc="유저 시퀀스" />
+			<puts>
+				SELECT OBJ_MAP_SEQ,SECTOR_IDX,CATE_ID,OBJ_ID,TILE_IDX,ROT_DIR,LAYER_IDX FROM TB_OBJ_MAP_INFO
+				WHERE ACCOUNTPK = $ACCOUNTPK
+			</puts>
+		</sql>		
+		
+		<sql name="guestlogin.GetMyStarContentsList" execute="Select" type="PreparedStatement" desc="오브젝트맵 가져오기">
+			<param name="ACCOUNTPK"			required="yes" 	desc="유저 시퀀스" />
+			<puts>
+				SELECT
+					A.STAR_CONT_SEQ,
+					A.STAR_CONT_CD,
+					CASE WHEN (FILE_TYPE=2 OR FILE_TYPE=3) THEN  'video_default.png'
+					ELSE A.REPRST_IMG_NM END REPRST_IMG_NM,
+					A.FILE_TYPE,
+					A.OBJ_MAP_SEQ,
+					B.POST_CNT
+				FROM
+				(
+					SELECT
+						STAR_CONT_SEQ,
+						STAR_CONT_CD,
+						REPRST_IMG_NM,
+						FILE_TYPE,
+						OBJ_MAP_SEQ
+					FROM
+					TB_STAR_CONT
+					WHERE ACCOUNTPK = $ACCOUNTPK
+				) A
+				LEFT OUTER JOIN
+				TB_STAR_CONT_COUNTER B
+				ON B.STAR_CONT_SEQ = A.STAR_CONT_SEQ
+			</puts>
+		</sql>		
+		
+		<sql name="guestlogin.GetSnsQuestList" execute="Select" type="PreparedStatement" desc="오브젝트맵 가져오기">
+			<param name="ACCOUNTPK"			required="yes" 	desc="유저 시퀀스" />
+			<puts>
+				SELECT 
+					A.QUEST_TYPE QUEST_ID,
+					A.QUEST_CNT,
+					A.QUEST_STEP,
+					A.TEAM_ACCOUNTPK,
+					A.AVATAR_CD AS TEAM_AVATAR_CD,
+					A.CONNECT_YN,
+					0 AS TEAM_QUEST_STEP,
+					B.PROF_PIC_NM,
+					TO_BASE64(B.INTRODUCE) INTRODUCE
+				FROM
+				(
+					(SELECT a.QUEST_TYPE, a.STEP AS QUEST_CNT, 0 AS QUEST_STEP, a.TEAM_ACCOUNTPK, c.AVATAR_CD, c.CONNECT_YN, B.STEP AS TEAM_QUEST_STEP
+						FROM TB_SNS_QUEST a, TB_USER c, 
+					    (
+							SELECT B.STEP FROM TB_SNS_QUEST B WHERE B.TEAM_ACCOUNTPK = ( SELECT TEAM_ACCOUNTPK FROM TB_SNS_QUEST WHERE ACCOUNTPK = $ACCOUNTPK AND QUEST_TYPE= 101 ORDER BY LIMIT_TIME DESC LIMIT 1 )
+					    ) B
+						WHERE a.TEAM_ACCOUNTPK = c.ACCOUNTPK 
+						AND a.ACCOUNTPK = $ACCOUNTPK AND a.QUEST_TYPE = 101
+						ORDER BY a.LIMIT_TIME DESC
+					    LIMIT 1)
+						UNION ALL
+					(SELECT a.QUEST_TYPE, a.STEP AS QUEST_CNT, b.STEP AS QUEST_STEP, a.TEAM_ACCOUNTPK, c.AVATAR_CD, c.CONNECT_YN, 0 AS TEAM_QUEST_STEP
+						FROM TB_SNS_QUEST a, TB_SNS_QUEST_SUB b, TB_USER c 
+						WHERE a.TEAM_ACCOUNTPK = b.TEAM_ACCOUNTPK
+					    AND a.LIMIT_TIME = b.LIMIT_TIME
+						AND a.TEAM_ACCOUNTPK = c.ACCOUNTPK 
+						AND a.ACCOUNTPK = $ACCOUNTPK AND b.ACCOUNTPK = $ACCOUNTPK
+					    ORDER BY a.LIMIT_TIME DESC, a.QUEST_TYPE
+					    LIMIT 2)
+				) A INNER JOIN  TB_SNS_USER_INFO B
+				ON B.ACCOUNTPK = A.TEAM_ACCOUNTPK
+			</puts>
+		</sql>		
+		
+		<sql name="guestlogin.GetSuggestFriendList" execute="Select" type="PreparedStatement" desc="오브젝트맵 가져오기">
+			<param name="ACCOUNTPK"			required="yes" 	desc="유저 시퀀스" />
+			<puts>
+	  			SELECT 
+					A.FRIEND_ACCOUNTPK,
+					B.AVATAR_CD,
+					B.CONNECT_YN,
+					C.PROF_PIC_NM,
+					TO_BASE64(C.INTRODUCE) INTRODUCE
+	 			FROM
+	 			(	
+		 			SELECT 
+		 				FRIEND_ACCOUNTPK 
+		 			FROM TB_SUGGEST_FRIEND 
+		 			WHERE ACCOUNTPK = $ACCOUNTPK 
+		 			ORDER BY SUGGEST_FRIEND_SEQ DESC
+		 			LIMIT 15
+	 				) A INNER JOIN TB_USER B INNER JOIN TB_SNS_USER_INFO C
+	 				ON A.FRIEND_ACCOUNTPK = B.ACCOUNTPK   	
+	 				AND A.FRIEND_ACCOUNTPK = C.ACCOUNTPK   
+			</puts>
+		</sql>				
+	</module>
+</sqlm>

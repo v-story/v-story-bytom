@@ -1,0 +1,1105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlm SYSTEM "http://10.95.26.153/dtd/sqlm_2_1.dtd" [
+]>
+<sqlm   ver="2.1">
+	<module name="starcont" desc="스타컨텐츠">
+	
+		<sql name="starcont.starContDupCheck_StarCont" execute="Select" type="PreparedStatement" desc="유저 단위로 스타컨텐츠코드, 스타컨텐츠명이 존재하는지 체크">
+			<param name="ACCOUNTPK" 		required="yes" 	desc="" />
+			<param name="STAR_CONT_CD" 		required="yes" 	desc="" />
+			<param name="OBJ_MAP_SEQ" 		required="yes" 	desc="" />
+			<!-- <param name="STAR_CONT_NM" 		required="yes" 	desc="" /> -->
+			<puts>
+				SELECT	COUNT(STAR_CONT_SEQ) FROM TB_STAR_CONT
+				WHERE ACCOUNTPK = $ACCOUNTPK
+					<!-- AND (STAR_CONT_CD = $STAR_CONT_CD OR STAR_CONT_NM = '$STAR_CONT_NM') -->
+				AND (STAR_CONT_CD = $STAR_CONT_CD OR OBJ_MAP_SEQ = $OBJ_MAP_SEQ)
+			</puts>
+		</sql>	
+		<sql name="starcont.starContCheck_StarCont" execute="Select" type="PreparedStatement" desc="스타컨텐츠가 있는지 체크">
+			<param name="ACCOUNTPK" 		required="yes" 	desc="" />
+			<param name="STAR_CONT_SEQ" 	required="yes" 	desc="" />
+			<puts>
+				SELECT COUNT(STAR_CONT_SEQ) FROM TB_STAR_CONT
+				WHERE STAR_CONT_SEQ = $STAR_CONT_SEQ
+				AND ACCOUNTPK = $ACCOUNTPK
+			</puts>
+		</sql>	
+		<sql name="starcont.ownerPostCheck_SNS" execute="Select" type="PreparedStatement" desc="스타컨텐츠에 게시물이 등록되어 있는지 체크">
+			<param name="ACCOUNTPK" 		required="yes" 	desc="" />
+			<param name="POST_SEQ" 			required="yes" 	desc="" />
+			<puts>
+				SELECT COUNT(POST_SEQ) FROM	TB_POST
+				WHERE POST_SEQ IN ($POST_SEQ)
+				AND ACCOUNTPK = $ACCOUNTPK
+			</puts>
+		</sql>	
+		<sql name="starcont.starContPostCheck_SNS" execute="Select" type="PreparedStatement" desc="스타컨텐츠에 게시물이 등록되어 있는지 체크">
+			<param name="STAR_CONT_SEQ" 	required="yes" 	desc="" />
+			<param name="POST_SEQ" 			required="yes" 	desc="" />
+			<puts>
+				SELECT COUNT(STAR_CONT_POST_SEQ) FROM TB_STAR_CONT_POST
+				WHERE STAR_CONT_SEQ = $STAR_CONT_SEQ
+				AND POST_SEQ IN ($POST_SEQ)
+			</puts>
+		</sql>	
+		
+		<sql name="starcont.objCheck_Game" execute="Select" type="PreparedStatement" desc="배치된 오브젝트 존재하는지 체크">
+			<param name="OBJ_MAP_SEQ" 		required="yes" 	desc="" />
+			<param name="ACCOUNTPK" 		required="yes" 	desc="" />
+			<puts>
+				SELECT COUNT(*)	FROM TB_OBJ_MAP_INFO
+				WHERE OBJ_MAP_SEQ = $OBJ_MAP_SEQ
+				AND ACCOUNTPK = $ACCOUNTPK
+			</puts>
+		</sql>
+		<sql name="starcont.getInterestTag_Game" execute="Select" type="PreparedStatement" desc="">
+			<param name="TAG_CD" 			required="yes" 	desc="" />
+			<puts>
+				SELECT ID AS TAG_CD,INTEREST_NM AS TAG_NM FROM	B_INTEREST 
+				WHERE ID IN ($TAG_CD)
+				AND GROUP_ID = 1
+			</puts>
+		</sql>
+
+		<sql name="starcont.modStarContPostInfoImgInit_StarCont" execute="Update" type="PreparedStatement" desc="">
+			<param name="STAR_CONT_SEQ" 		required="yes" 	desc="" />
+			<param name="REPRST_IMG_POST_SEQ"	required="yes" 	desc="" />
+			<puts>
+				UPDATE TB_POST_INFO SET	REPRST_IMG_POST_SEQ = $REPRST_IMG_POST_SEQ
+				WHERE STAR_CONT_SEQ = $STAR_CONT_SEQ
+			</puts>
+		</sql>		
+		<sql name="starcont.getPostCnt_SNS" execute="Select" type="PreparedStatement" desc="게시물에 등록된 개수 정보를 얻는다.">
+			<param name="POST_SEQ" 			required="yes" 	desc="" />
+			<puts>
+				SELECT
+					SUM(COMMENT_CNT) AS COMMENT_CNT,
+					SUM(HEART_CNT) AS HEART_CNT,
+					SUM(SMILE_CNT) AS SMILE_CNT,
+					SUM(PIC_CNT) AS PIC_CNT,
+					SUM(VIDEO_CNT) AS VIDEO_CNT
+				FROM TB_POST
+				WHERE POST_SEQ IN ($POST_SEQ)
+			</puts>
+		</sql>
+		<sql name="starcont.getStarContTag_StarCont" execute="Select" type="PreparedStatement" desc="스타컨텐츠의 태그 검색">
+			<param name="STAR_CONT_SEQ" 	required="yes" 	desc="" />
+			<puts>
+				SELECT
+					STAR_CONT_CD AS TAG_CD,
+					STAR_CONT_NM AS TAG_NM
+				FROM
+					TB_STAR_CONT
+				WHERE
+					STAR_CONT_SEQ = $STAR_CONT_SEQ
+			</puts>
+		</sql>
+		<sql name="starcont.modStarContFollowCounter_SNS" execute="Update" type="PreparedStatement" desc="스타컨텐츠 follow 카운터 갱신">
+			<param name="ACCOUNTPK" 		required="yes" 	desc="" />
+			<param name="OPT_ACCOUNTPK" 	required="yes" 	desc="" />
+			<param name="VAL" 				required="yes" 	desc="" />
+			<puts>
+				UPDATE TB_COUNTER SET
+					FOLLOW_CNT = FOLLOW_CNT + $VAL
+				WHERE
+					ACCOUNTPK = $ACCOUNTPK
+			</puts>
+		</sql>	
+		<sql name="starcont.getStarContAccountPk_StarCont" execute="Select" type="PreparedStatement" desc="스타컨텐츠의 소유자Pk 검색">
+			<param name="STAR_CONT_SEQ" 	required="yes" 	desc="" />
+			<puts>
+				SELECT ACCOUNTPK FROM TB_STAR_CONT WHERE STAR_CONT_SEQ = $STAR_CONT_SEQ
+			</puts>
+		</sql>
+		<sql name="starcont.modStarContCounterFollow_StarCont" execute="Update" type="PreparedStatement" desc="스타컨텐츠를 카운터 갱신">
+			<param name="STAR_CONT_SEQ" 	required="yes" 	desc="" />
+			<param name="FOLLOWER_CNT" 		required="yes" 	desc="" />
+			<puts>
+				UPDATE TB_STAR_CONT_COUNTER SET
+					FOLLOWER_CNT = FOLLOWER_CNT+$FOLLOWER_CNT
+				WHERE
+					STAR_CONT_SEQ = $STAR_CONT_SEQ
+			</puts>
+		</sql>		
+		<sql name="starcont.regStarContPost_SNS" execute="Update" type="PreparedStatement" desc="스타컨텐츠를 게시물 등록">
+			<param name="ACCOUNTPK" 		required="yes" 	desc="" />
+			<param name="STAR_CONT_SEQ" 	required="yes" 	desc="" />
+			<param name="POST_SEQ" 			required="yes" 	desc="" />
+			<param name="PIC_EXIST_YN" 		required="yes" 	desc="" />
+			<param name="VIDEO_EXIST_YN" 	required="yes" 	desc="" />
+			<puts>
+				INSERT INTO TB_STAR_CONT_POST
+					(ACCOUNTPK, STAR_CONT_SEQ, POST_SEQ, PIC_EXIST_YN, VIDEO_EXIST_YN)
+				VALUES
+					($ACCOUNTPK, $STAR_CONT_SEQ, $POST_SEQ, $PIC_EXIST_YN, $VIDEO_EXIST_YN)
+			</puts>
+		</sql>	
+		<sql name="starcont.getPostVideoCnt_SNS" execute="Select" type="PreparedStatement" desc="게시물 비디오파일 개수 등록">
+			<param name="POST_SEQ" 			required="yes" 	desc="" />
+			<puts>
+				SELECT
+					PIC_CNT, VIDEO_CNT
+				FROM
+					TB_POST
+				WHERE 
+					POST_SEQ = $POST_SEQ
+			</puts>
+		</sql>
+			
+		<sql name="starcont.modUserStarContExistYN_SNS" execute="Update" type="PreparedStatement" desc="스타컨텐츠를 존재유무 갱신">
+			<param name="ACCOUNTPK" 			required="yes" 	desc="" />
+			<param name="STARCONT_EXIST_YN" 	required="yes" 	desc="" />
+			<puts>
+				UPDATE TB_USER SET
+					STARCONT_EXIST_YN = $STARCONT_EXIST_YN
+				WHERE ACCOUNTPK = $ACCOUNTPK
+			</puts>
+		</sql>	
+
+
+<!-- regStarContents -->
+
+		<sql name="starcont.getPostPicVideoCnt_SNS" execute="Select" type="PreparedStatement" desc="게시물에 등록된 이미지,동영상 개수 정보를 얻는다.">
+			<param name="POST_SEQ" 			required="yes" 	desc="" />
+			<puts>
+				<!-- 
+					SELECT POST_SEQ,PIC_CNT,VIDEO_CNT FROM TB_POST
+					WHERE POST_SEQ IN ($POST_SEQ)
+					ORDER BY POST_SEQ DESC
+				 -->
+				SELECT POST_SEQ,SUM(PIC_CNT) AS PIC_CNT,SUM(VIDEO_CNT) AS VIDEO_CNT
+				FROM TB_POST
+				WHERE POST_SEQ IN ($POST_SEQ)
+				GROUP BY POST_SEQ
+				ORDER BY POST_SEQ DESC
+			</puts>
+		</sql>
+		<sql name="starcont.getReprstImg_SNS" execute="Select" type="PreparedStatement" desc="게시물에 등록된 첫번째 이미지/동영상 팡리 정보를 얻는다.">
+			<param name="POST_SEQ" 			required="yes" 	desc="" />
+			<puts>
+				SELECT FILE_NM AS REPRST_IMG_NM,FILE_TYPE FROM TB_FILE_INFO
+				WHERE POST_SEQ = $POST_SEQ AND FILE_NUM = 1
+			</puts>
+		</sql>	
+		<sql name="starcont.regStarCont_StarCont" execute="Update" type="PreparedStatement" desc="스타컨텐츠를 등록">
+			<param name="ACCOUNTPK" 		required="yes" 	desc="" />
+			<param name="STAR_CONT_CD" 		required="yes" 	desc="" />
+			<param name="STAR_CONT_NM" 		required="yes" 	desc="" />
+			<param name="STAR_CONT_DES" 	required="yes" 	desc="" />
+			<param name="REPRST_IMG_NM" 	required="yes" 	desc="" />
+			<param name="FILE_TYPE" 		required="yes" 	desc="" />
+			<param name="URL" 				required="yes" 	desc="" />
+			<param name="OBJ_MAP_SEQ" 		required="yes" 	desc="" />
+			<puts>
+				INSERT INTO TB_STAR_CONT
+					(ACCOUNTPK, STAR_CONT_CD, STAR_CONT_NM, STAR_CONT_DES, REPRST_IMG_NM, FILE_TYPE, URL, OBJ_MAP_SEQ)
+				VALUES
+					($ACCOUNTPK, $STAR_CONT_CD, '$STAR_CONT_NM', '$STAR_CONT_DES', '$REPRST_IMG_NM', $FILE_TYPE, '$URL', $OBJ_MAP_SEQ)
+			</puts>
+		</sql>
+		<sql name="starcont.regStarContCounter_StarCont" execute="Update" type="PreparedStatement" desc="스타컨텐츠를 카운터 등록">
+			<param name="STAR_CONT_SEQ" 	required="yes" 	desc="" />
+			<param name="ACCOUNTPK" 		required="yes" 	desc="" />
+			<param name="STAR_CONT_CD" 		required="yes" 	desc="" />
+			<param name="POST_CNT" 			required="yes" 	desc="" />
+			<param name="PIC_CNT" 			required="yes" 	desc="" />
+			<param name="VIDEO_CNT" 		required="yes" 	desc="" />
+			<param name="COMMENT_CNT" 		required="yes" 	desc="" />
+			<param name="HEART_CNT" 		required="yes" 	desc="" />
+			<param name="SMILE_CNT" 		required="yes" 	desc="" />
+			<puts>
+				INSERT INTO TB_STAR_CONT_COUNTER
+					(STAR_CONT_SEQ, ACCOUNTPK, STAR_CONT_CD, POST_CNT, PIC_CNT, VIDEO_CNT, FOLLOWER_CNT, COMMENT_CNT, HEART_CNT, SMILE_CNT)
+				VALUES
+					($STAR_CONT_SEQ, $ACCOUNTPK, $STAR_CONT_CD, $POST_CNT, $PIC_CNT, $VIDEO_CNT, 0, $COMMENT_CNT, $HEART_CNT, $SMILE_CNT)
+			</puts>
+		</sql>
+		<!--
+		<sql name="starcont.regStarContTag_StarCont" execute="Update" type="PreparedStatement" desc="스타컨텐츠를 태그 등록">
+			<param name="STAR_CONT_SEQ" 	required="yes" 	desc="" />
+			<param name="ACCOUNTPK" 		required="yes" 	desc="" />
+			<param name="TAG_CD" 			required="yes" 	desc="" />
+			<param name="TAG_NM" 			required="yes" 	desc="" />
+			<puts>
+				INSERT INTO TB_STAR_CONT_TAG
+					(ACCOUNTPK, STAR_CONT_SEQ, TAG_CD, TAG_NM)
+				VALUES
+					($ACCOUNTPK, $STAR_CONT_SEQ, $TAG_CD, '$TAG_NM')
+			</puts>
+		</sql>
+		-->
+		<sql name="starcont.regStarContPostInfo_StarCont" execute="Update" type="PreparedStatement" desc="스타컨텐츠를  게시물정보 등록">
+			<param name="STAR_CONT_SEQ" 		required="yes" 	desc="" />
+			<param name="ACCOUNTPK" 			required="yes" 	desc="" />
+			<param name="REPRST_IMG_POST_SEQ" 	required="yes" 	desc="" />
+			<param name="LAST_VIDEO_POST_SEQ" 	required="yes" 	desc="" />
+			<puts>
+				INSERT INTO TB_POST_INFO
+					(STAR_CONT_SEQ, ACCOUNTPK, REPRST_IMG_POST_SEQ, LAST_VIDEO_POST_SEQ)
+				VALUES
+					($STAR_CONT_SEQ, $ACCOUNTPK, $REPRST_IMG_POST_SEQ, $LAST_VIDEO_POST_SEQ)
+			</puts>
+		</sql>
+
+
+<!-- listStarContents -->
+		<sql name="starcont.getStarCont_StarCont" execute="Select" type="PreparedStatement" desc="스타컨텐츠 정보를 얻는다.">
+			<param name="ACCOUNTPK" 		required="yes" 	desc="" />
+			<puts>
+				SELECT
+					A.*,
+					B.POST_CNT
+				FROM
+					(
+					SELECT
+						STAR_CONT_SEQ,
+						STAR_CONT_CD,
+						STAR_CONT_NM,
+						<!-- CASE WHEN FILE_TYPE > 1 THEN 'video_default.png' ELSE REPRST_IMG_NM END AS REPRST_IMG_NM, -->
+						REPRST_IMG_NM,
+						FILE_TYPE,
+						OBJ_MAP_SEQ
+					FROM
+						TB_STAR_CONT
+					WHERE 1=1
+						AND ACCOUNTPK = $ACCOUNTPK
+					) A
+					LEFT OUTER JOIN
+					TB_STAR_CONT_COUNTER B
+					ON A.STAR_CONT_SEQ = B.STAR_CONT_SEQ
+				<!--
+				SELECT
+					A.*,
+					B.POST_CNT
+				FROM
+					(
+					SELECT
+						STAR_CONT_SEQ,
+						STAR_CONT_CD,
+						STAR_CONT_NM,
+						CASE 
+						WHEN FILE_TYPE = 2 THEN CONCAT(SUBSTRING_INDEX(REPRST_IMG_NM,'.',1),'.png')
+						WHEN FILE_TYPE = 3 THEN 'video_default.png'
+						ELSE REPRST_IMG_NM END 
+						AS REPRST_IMG_NM,
+						FILE_TYPE,
+						OBJ_MAP_SEQ
+					FROM
+						TB_STAR_CONT
+					WHERE 1=1
+						AND ACCOUNTPK = $ACCOUNTPK
+					) A
+					LEFT OUTER JOIN
+					TB_STAR_CONT_COUNTER B
+					ON A.STAR_CONT_SEQ = B.STAR_CONT_SEQ
+				-->
+			</puts>
+		</sql>
+
+
+<!-- regPostToStarContents -->
+		<sql name="starcont.modStarContCounter_StarCont" execute="Update" type="PreparedStatement" desc="스타컨텐츠를 카운터 갱신">
+			<param name="STAR_CONT_SEQ" 	required="yes" 	desc="" />
+			<param name="POST_CNT" 			required="yes" 	desc="" />
+			<param name="PIC_CNT" 			required="yes" 	desc="" />
+			<param name="VIDEO_CNT" 		required="yes" 	desc="" />
+			<param name="COMMENT_CNT" 		required="yes" 	desc="" />
+			<param name="HEART_CNT" 		required="yes" 	desc="" />
+			<param name="SMILE_CNT" 		required="yes" 	desc="" />
+			<puts>
+				UPDATE TB_STAR_CONT_COUNTER SET
+					POST_CNT = POST_CNT+$POST_CNT, 
+					PIC_CNT = PIC_CNT+$PIC_CNT, 
+					VIDEO_CNT = VIDEO_CNT+$VIDEO_CNT, 
+					COMMENT_CNT = COMMENT_CNT+$COMMENT_CNT, 
+					HEART_CNT = HEART_CNT+$HEART_CNT,
+					SMILE_CNT = SMILE_CNT+$SMILE_CNT
+				WHERE
+					STAR_CONT_SEQ = $STAR_CONT_SEQ
+			</puts>
+		</sql>
+		<sql name="starcont.modStarContPostInfoVideo_StarCont" execute="Update" type="PreparedStatement" desc="스타컨텐츠의 게시물정보 업데이트">
+			<param name="STAR_CONT_SEQ" 	required="yes" 	desc="" />
+			<param name="POST_SEQ" 			required="yes" 	desc="" />
+			<puts>
+				UPDATE TB_POST_INFO a, 
+				(SELECT STAR_CONT_SEQ, CASE WHEN LAST_VIDEO_POST_SEQ > $POST_SEQ THEN LAST_VIDEO_POST_SEQ ELSE $POST_SEQ END POST_SEQ FROM TB_POST_INFO WHERE STAR_CONT_SEQ = $STAR_CONT_SEQ) b
+				SET a.LAST_VIDEO_POST_SEQ = b.POST_SEQ
+				WHERE a.STAR_CONT_SEQ = b.STAR_CONT_SEQ
+			</puts>
+		</sql>
+		
+		
+		
+		
+		
+		<sql name="starcont.getTagCnt_SNS" execute="Select" type="PreparedStatement" desc="태그 개수">
+			<param name="TAG_NM" 		required="yes" 	desc="" />
+			<puts>
+				SELECT TAG_SEQ FROM TB_TAG WHERE TAG_NM = '$TAG_NM'
+			</puts>
+		</sql>		
+		<sql name="starcont.regTag_SNS" execute="Update" type="PreparedStatement" desc="게시물 태그에 등록">
+			<param name="TAG_NM" 		required="yes" 	desc="" />
+			<puts>
+				INSERT INTO TB_TAG (TAG_NM, POST_CNT) VALUES ('$TAG_NM', 1)
+			</puts>
+		</sql>
+		<sql name="starcont.modTag_SNS" execute="Update" type="PreparedStatement" desc="게시물 태그에 카운트 증가">
+			<param name="TAG_SEQ" 		required="yes" 	desc="" />
+			<puts>
+				UPDATE TB_TAG SET POST_CNT = POST_CNT + 1 WHERE TAG_SEQ = $TAG_SEQ
+			</puts>
+		</sql>
+		<sql name="starcont.regTagPost_SNS" execute="Update" type="PreparedStatement" desc="게시물 태그 매핑에 등록">
+			<param name="ACCOUNTPK" 		required="yes" 	desc="" />
+			<param name="POST_SEQ" 			required="yes" 	desc="" />
+			<param name="TAG_SEQ" 			required="yes" 	desc="" />
+			<puts>
+				<!-- INSERT INTO TB_TAG_POST (ACCOUNTPK, POST_SEQ, TAG_SEQ) VALUES ($ACCOUNTPK, $POST_SEQ, $TAG_SEQ) -->
+				<!-- 
+				INSERT INTO TB_TAG_POST (ACCOUNTPK, POST_SEQ, TAG_SEQ) SELECT $ACCOUNTPK, $POST_SEQ, $TAG_SEQ  FROM DUAL
+				WHERE NOT EXISTS ( SELECT * FROM TB_TAG_POST WHERE POST_SEQ = $POST_SEQ AND TAG_SEQ = $TAG_SEQ )
+				-->
+				INSERT INTO TB_TAG_POST (ACCOUNTPK, POST_SEQ, TAG_SEQ) VALUES ($ACCOUNTPK, $POST_SEQ, $TAG_SEQ)
+				ON DUPLICATE KEY UPDATE CNT = 2
+			</puts>
+		</sql>
+		<sql name="starcont.getTagPostCnt_SNS" execute="Select" type="PreparedStatement" desc="">
+			<param name="POST_SEQ" 			required="yes" 	desc="" />
+			<param name="TAG_SEQ" 			required="yes" 	desc="" />
+			<puts>
+				SELECT
+					COUNT(SEQ) AS CNT
+				FROM
+					TB_TAG_POST
+				WHERE
+					POST_SEQ = $POST_SEQ
+					AND TAG_SEQ = $TAG_SEQ
+				
+			</puts>
+		</sql>
+		
+		
+
+
+
+<!-- modReprstImgToStarContents -->
+		<sql name="starcont.getReprstImgCnt_SNS" execute="Select" type="PreparedStatement" desc="">
+			<param name="ACCOUNTPK" 		required="yes" 	desc="" />
+			<param name="POST_SEQ" 			required="yes" 	desc="" />
+			<param name="REPRST_IMG_NM" 	required="yes" 	desc="" />
+			<param name="FILE_TYPE" 		required="yes" 	desc="" />
+			<puts>
+				SELECT
+					COUNT(B.POST_FILE_SEQ) AS CNT
+				FROM
+					(SELECT POST_SEQ FROM TB_POST WHERE POST_SEQ = $POST_SEQ AND ACCOUNTPK = $ACCOUNTPK) A
+					INNER JOIN
+					TB_FILE_INFO B
+					ON A.POST_SEQ = B.POST_SEQ AND FILE_NM = '$REPRST_IMG_NM' AND FILE_TYPE = $FILE_TYPE
+				
+			</puts>
+		</sql>
+		<sql name="starcont.modStarContReprstImg_StarCont" execute="Update" type="PreparedStatement" desc="스타컨텐츠를 대표이미지 갱신">
+			<param name="ACCOUNTPK" 		required="yes" 	desc="" />
+			<param name="STAR_CONT_SEQ" 	required="yes" 	desc="" />
+			<param name="REPRST_IMG_NM" 	required="yes" 	desc="" />
+			<param name="FILE_TYPE" 		required="yes" 	desc="" />
+			<puts>
+				UPDATE TB_STAR_CONT SET
+					REPRST_IMG_NM = '$REPRST_IMG_NM', 
+					FILE_TYPE = $FILE_TYPE
+				WHERE
+					STAR_CONT_SEQ = $STAR_CONT_SEQ
+					AND ACCOUNTPK = $ACCOUNTPK
+			</puts>
+		</sql>
+
+
+<!-- modStarContents -->
+		<sql name="starcont.modStarCont_StarCont" execute="Update" type="PreparedStatement" desc="스타컨텐츠를 이름,설명,URL 갱신">
+			<param name="ACCOUNTPK" 		required="yes" 	desc="" />
+			<param name="STAR_CONT_SEQ" 	required="yes" 	desc="" />
+			<!-- <param name="STAR_CONT_NM" 		required="yes" 	desc="" /> -->
+			<param name="STAR_CONT_DES" 	required="yes" 	desc="" />
+			<param name="URL" 				required="yes" 	desc="" />
+			<puts>
+				UPDATE TB_STAR_CONT SET
+					<!-- STAR_CONT_NM = '$STAR_CONT_NM', --> 
+					STAR_CONT_DES = '$STAR_CONT_DES',
+					URL = '$URL'
+				WHERE
+					STAR_CONT_SEQ = $STAR_CONT_SEQ
+					AND ACCOUNTPK = $ACCOUNTPK
+			</puts>
+		</sql>
+
+
+<!-- regFollowStarContents -->
+		<sql name="starcont.followDupCheck_StarCont" execute="Select" type="PreparedStatement" desc="유저 단위로 스타컨텐츠코드, 스타컨텐츠명이 존재하는지 체크">
+			<param name="ACCOUNTPK" 			required="yes" 	desc="" />
+			<param name="STAR_CONT_SEQ" 		required="yes" 	desc="" />
+			<puts>
+				SELECT	COUNT(STAR_CONT_FOLLOW_SEQ)	FROM TB_STAR_CONT_FOLLOW
+				WHERE STAR_CONT_SEQ = $STAR_CONT_SEQ
+				AND ACCOUNTPK = $ACCOUNTPK
+			</puts>
+		</sql>	
+		<sql name="starcont.regStarContFollow_StarCont" execute="Update" type="PreparedStatement" desc="스타컨텐츠를 팔로우 등록">
+			<param name="STAR_CONT_SEQ" 	required="yes" 	desc="" />
+			<param name="ACCOUNTPK" 		required="yes" 	desc="" />
+			<puts>
+				INSERT INTO TB_STAR_CONT_FOLLOW
+					(ACCOUNTPK, STAR_CONT_SEQ)
+				VALUES
+					($ACCOUNTPK, $STAR_CONT_SEQ)
+			</puts>
+		</sql>		
+		<sql name="starcont.regStarContFollow_SNS" execute="Update" type="PreparedStatement" desc="스타컨텐츠 follow">
+			<param name="ACCOUNTPK" 		required="yes" 	desc="" />
+			<param name="OPT_ACCOUNTPK" 	required="yes" 	desc="" />
+			<puts>
+				INSERT INTO TB_FOLLOW 
+					(ACCOUNTPK, FOLLOW_USER_SEQ) SELECT $ACCOUNTPK, $OPT_ACCOUNTPK FROM DUAL 
+					WHERE NOT EXISTS ( SELECT * FROM TB_FOLLOW WHERE ACCOUNTPK = $ACCOUNTPK AND FOLLOW_USER_SEQ = $OPT_ACCOUNTPK )
+			</puts>
+		</sql>	
+		<sql name="starcont.regStarContFollower_SNS" execute="Update" type="PreparedStatement" desc="스타컨텐츠 follower">
+			<param name="ACCOUNTPK" 		required="yes" 	desc="" />
+			<param name="OPT_ACCOUNTPK" 	required="yes" 	desc="" />
+			<puts>
+				INSERT INTO TB_FOLLOWER 
+					(ACCOUNTPK, FOLLOWER_USER_SEQ) SELECT $OPT_ACCOUNTPK, $ACCOUNTPK FROM DUAL 
+					WHERE NOT EXISTS ( SELECT * FROM TB_FOLLOWER WHERE ACCOUNTPK = $OPT_ACCOUNTPK AND FOLLOWER_USER_SEQ = $ACCOUNTPK )
+			</puts>
+		</sql>	
+		<sql name="starcont.getFollowCnt_StarCont" execute="Select" type="PreparedStatement" desc="">
+			<param name="STAR_CONT_SEQ" 		required="yes" 	desc="" />
+			<puts>
+				SELECT
+					A.STAR_CONT_SEQ,
+					A.ACCOUNTPK,
+					A.STAR_CONT_CD,
+					B.FOLLOWER_CNT
+				FROM
+					(SELECT STAR_CONT_SEQ, ACCOUNTPK, STAR_CONT_CD FROM TB_STAR_CONT WHERE STAR_CONT_SEQ = $STAR_CONT_SEQ) A
+					INNER JOIN
+					TB_STAR_CONT_COUNTER B
+					ON A.STAR_CONT_SEQ = B.STAR_CONT_SEQ
+			</puts>
+		</sql>	
+
+
+<!-- delFollowStarContents -->
+		<sql name="starcont.delStarContFollow_StarCont" execute="Update" type="PreparedStatement" desc="스타컨텐츠를 팔로우 삭제">
+			<param name="STAR_CONT_SEQ" 	required="yes" 	desc="" />
+			<param name="ACCOUNTPK" 		required="yes" 	desc="" />
+			<puts>
+				DELETE FROM TB_STAR_CONT_FOLLOW WHERE STAR_CONT_SEQ=$STAR_CONT_SEQ AND ACCOUNTPK=$ACCOUNTPK
+			</puts>
+		</sql>		
+		<sql name="starcont.getStarContFollowCnt_StarCont" execute="Select" type="PreparedStatement" desc="특정유저의 팔로우한 스타컨텐츠 개수를 얻는다. ">
+			<param name="ACCOUNTPK" 		required="yes" 	desc="" />
+			<param name="OPT_ACCOUNTPK" 	required="yes" 	desc="" />
+			<puts>
+				SELECT
+					COUNT(X1.STAR_CONT_SEQ) CNT
+				FROM
+					(
+					SELECT
+						A.*
+					FROM
+						(
+						SELECT 
+							STAR_CONT_SEQ
+						FROM
+							TB_STAR_CONT_FOLLOW
+						WHERE 1=1
+							AND ACCOUNTPK = $ACCOUNTPK
+						) A
+						INNER JOIN
+						TB_STAR_CONT B
+						ON A.STAR_CONT_SEQ = B.STAR_CONT_SEQ AND B.ACCOUNTPK = $OPT_ACCOUNTPK
+					) X1
+			</puts>
+		</sql>
+		<!--
+		<sql name="starcont.delStarContFollow_SNS" execute="Update" type="PreparedStatement" desc="스타컨텐츠 follow 삭제">
+			<param name="ACCOUNTPK" 		required="yes" 	desc="" />
+			<param name="OPT_ACCOUNTPK" 	required="yes" 	desc="" />
+			<puts>
+				DELETE FROM TB_FOLLOW 
+					WHERE ACCOUNTPK = $ACCOUNTPK AND FOLLOW_USER_SEQ = $OPT_ACCOUNTPK
+			</puts>
+		</sql>	
+		<sql name="starcont.delStarContFollower_SNS" execute="Update" type="PreparedStatement" desc="스타컨텐츠 follower 삭제">
+			<param name="ACCOUNTPK" 		required="yes" 	desc="" />
+			<param name="OPT_ACCOUNTPK" 	required="yes" 	desc="" />
+			<puts>
+				DELETE FROM TB_FOLLOWER 
+					WHERE ACCOUNTPK = $OPT_ACCOUNTPK AND FOLLOWER_USER_SEQ = $ACCOUNTPK
+			</puts>
+		</sql>
+		-->
+
+<!-- listPostForStarContents -->
+		<sql name="starcont.postForStarContentsListTotalCnt" execute="Select" type="PreparedStatement" desc="특정 스타컨텐츠의 게시물 총 개수">
+			<param name="STAR_CONT_SEQ" 	required="yes" 	desc="" />
+			<puts>
+				SELECT
+					COUNT(POST_SEQ) CNT
+				FROM
+					TB_STAR_CONT_POST
+				WHERE
+					STAR_CONT_SEQ = $STAR_CONT_SEQ
+			</puts>
+		</sql>
+		<sql name="starcont.pagePostSeqStarCont_SNS" execute="Select" type="PreparedStatement" desc="특정 스타컨텐츠의 페이지단위 게시물 시퀀스 얻기">
+			<param name="STAR_CONT_SEQ" 	required="yes" 	desc="" />
+			<param name="OFFSET" 			required="yes" 	desc="" />
+			<param name="ROWS" 				required="yes" 	desc="" />
+			<puts>
+				SELECT
+					GROUP_CONCAT(A.POST_SEQ ORDER BY A.STAR_CONT_POST_SEQ DESC) AS STR_POST_SEQ
+				FROM
+				(
+					SELECT
+						POST_SEQ,STAR_CONT_POST_SEQ
+					FROM
+						TB_STAR_CONT_POST
+					WHERE
+						STAR_CONT_SEQ = $STAR_CONT_SEQ
+					LIMIT $OFFSET, $ROWS
+				) A
+				<!-- 
+				SELECT
+					GROUP_CONCAT(A.POST_SEQ ORDER BY A.POST_SEQ DESC) AS STR_POST_SEQ
+				FROM
+					(
+					SELECT
+						POST_SEQ
+					FROM
+						TB_STAR_CONT_POST
+					WHERE
+						STAR_CONT_SEQ = $STAR_CONT_SEQ
+					ORDER BY POST_SEQ DESC
+					LIMIT $OFFSET, $ROWS
+					) A
+					 -->
+			</puts>
+		</sql>	
+		<sql name="starcont.getPostUserInfo_SNS" execute="Select" type="PreparedStatement" desc="post_seq 기준으로 유저 정보 얻기">
+			<param name="POST_SEQ" 			required="yes" 	desc="" />
+			<puts>
+				SELECT
+					A.POST_SEQ, 
+					A.ACCOUNTPK, 
+					B.ID, 
+					IFNULL(B.PROF_PIC_NM, 'profile_default.png') AS PROF_PIC_NM,
+					B.AVATAR_CD
+				FROM
+					(
+					SELECT
+						POST_SEQ, ACCOUNTPK
+					FROM
+						TB_HOME_POST
+					WHERE 
+						POST_SEQ IN ($POST_SEQ)
+					) A
+					LEFT OUTER JOIN
+					TB_USER B
+					ON A.ACCOUNTPK = B.ACCOUNTPK			
+			</puts>
+		</sql>	
+		<sql name="starcont.postForStarContentsList4jqGrid" execute="Select" type="PreparedStatement" desc="특정 스타컨텐츠의 팔로우유저 게시물">
+			<param name="ACCOUNTPK" 			required="yes" 	desc="" />
+			<param name="POST_SEQ" 				required="yes" 	desc="게시물  시퀀스" />
+			<puts>
+				SELECT
+					X1.*
+					,IFNULL(X2.FILE_NM_S, '') AS FILE_NM_S
+					,IFNULL(X2.FILE_TYPE_S, '') AS FILE_TYPE_S
+					,IF(X3.SMILE_SEQ IS NULL, 0, 1) AS SMILE
+					,IF(X4.HEART_SEQ IS NULL, 0, 1) AS HEART
+				FROM
+					(
+					SELECT
+						POST_SEQ,
+						CONT,
+						HEART_CNT,
+						SMILE_CNT,
+						COMMENT_CNT,
+						TIMESTAMPDIFF(HOUR, REG_TIME, NOW()) AS DIFF_TIME,
+						REG_TIME
+					FROM
+						TB_POST
+					WHERE 
+						POST_SEQ IN ($POST_SEQ)
+					) X1
+					LEFT OUTER JOIN
+					(
+					SELECT 
+						POST_SEQ, 
+						GROUP_CONCAT(FILE_NM ORDER BY FILE_NUM ASC) AS FILE_NM_S, 
+						GROUP_CONCAT(FILE_TYPE ORDER BY FILE_NUM ASC) AS FILE_TYPE_S 
+					FROM 
+						TB_FILE_INFO 
+					WHERE 
+						POST_SEQ IN ($POST_SEQ) 
+					GROUP BY POST_SEQ
+					) X2
+					ON X1.POST_SEQ = X2.POST_SEQ
+					LEFT OUTER JOIN
+					TB_SMILE_HIST X3
+					ON X1.POST_SEQ = X3.POST_SEQ AND X3.ACCOUNTPK = $ACCOUNTPK
+					LEFT OUTER JOIN
+					TB_HEART_HIST X4
+					ON X1.POST_SEQ = X4.POST_SEQ AND X4.ACCOUNTPK = $ACCOUNTPK
+					ORDER BY FIELD(X1.POST_SEQ, $POST_SEQ)
+				<!-- ORDER BY X1.POST_SEQ DESC -->
+			</puts>
+		</sql>
+
+<!-- modObjectStarContents -->
+		<sql name="starcont.modStarContObj_StarCont" execute="Update" type="PreparedStatement" desc="스타컨텐츠를 오브젝트시퀀스 갱신">
+			<param name="STAR_CONT_SEQ" 	required="yes" 	desc="" />
+			<param name="OBJ_MAP_SEQ" 		required="yes" 	desc="" />
+			<puts>
+				UPDATE TB_STAR_CONT SET
+					OBJ_MAP_SEQ = $OBJ_MAP_SEQ
+				WHERE
+					STAR_CONT_SEQ = $STAR_CONT_SEQ
+			</puts>
+		</sql>
+
+<!-- getUserForStarContents -->
+		<sql name="starcont.getStarContInfo_StarCont" execute="Select" type="PreparedStatement" desc="스타컨텐츠 정보를 얻는다.">
+			<param name="STAR_CONT_SEQ" 		required="yes" 	desc="" />
+			<puts>
+				SELECT
+					A.ACCOUNTPK,
+					B.PIC_CNT,
+					B.VIDEO_CNT,
+					B.FOLLOWER_CNT,
+					B.COMMENT_CNT,
+					B.HEART_CNT,
+					B.SMILE_CNT,
+					A.STAR_CONT_NM,
+					A.STAR_CONT_CD,
+					A.STAR_CONT_DES,
+					A.URL
+				FROM
+					(
+					SELECT
+						ACCOUNTPK,
+						STAR_CONT_SEQ,
+						STAR_CONT_NM,
+						STAR_CONT_CD,
+						STAR_CONT_DES,
+						URL
+					FROM
+						TB_STAR_CONT
+					WHERE 1=1
+						AND STAR_CONT_SEQ = $STAR_CONT_SEQ
+					) A
+					LEFT OUTER JOIN
+					TB_STAR_CONT_COUNTER B
+					ON A.STAR_CONT_SEQ = B.STAR_CONT_SEQ
+			</puts>
+		</sql>
+		<sql name="starcont.getStarContUserInfo_SNS" execute="Select" type="PreparedStatement" desc="star_cont_seq 기준으로 유저 정보 얻기">
+			<param name="ACCOUNTPK" 			required="yes" 	desc="" />
+			<puts>
+				SELECT
+					ID,
+					PROF_PIC_NM,
+					AVATAR_CD
+				FROM
+					TB_USER
+				WHERE
+					ACCOUNTPK = $ACCOUNTPK
+			</puts>
+		</sql>	
+
+<!-- delPostFromStarContents -->
+		<sql name="starcont.getStarContentsReprstImgNm_StarCont" execute="Select" type="PreparedStatement" desc="스타컨텐츠 정보를 얻는다.">
+			<param name="STAR_CONT_SEQ" 		required="yes" 	desc="" />
+			<puts>
+				SELECT
+					REPRST_IMG_NM,
+					FILE_TYPE
+				FROM
+					TB_STAR_CONT
+				WHERE 1=1
+					AND STAR_CONT_SEQ = $STAR_CONT_SEQ
+			</puts>
+		</sql>
+		<sql name="starcont.getStarContPostCnt_SNS" execute="Select" type="PreparedStatement" desc="">
+			<param name="STAR_CONT_SEQ" 	required="yes" 	desc="" />
+			<puts>
+				SELECT COUNT(STAR_CONT_POST_SEQ) CNT FROM TB_STAR_CONT_POST WHERE STAR_CONT_SEQ = $STAR_CONT_SEQ
+			</puts>
+		</sql>
+		<sql name="starcont.getStarContPostSeqVideoCur_SNS" execute="Select" type="PreparedStatement" desc="">
+			<param name="STAR_CONT_SEQ" 	required="yes" 	desc="" />
+			<param name="POST_SEQ" 			required="yes" 	desc="" />
+			<puts>
+				SELECT 
+					POST_SEQ 
+				FROM 
+					TB_STAR_CONT_POST 
+				WHERE 
+					STAR_CONT_SEQ = $STAR_CONT_SEQ 
+					AND POST_SEQ = $POST_SEQ 
+					AND VIDEO_EXIST_YN = 1
+			</puts>
+		</sql>
+		<sql name="starcont.delStarContPost_SNS" execute="Update" type="PreparedStatement" desc="">
+			<param name="STAR_CONT_SEQ" 	required="yes" 	desc="" />
+			<param name="POST_SEQ" 			required="yes" 	desc="" />
+			<puts>
+				DELETE FROM TB_STAR_CONT_POST WHERE STAR_CONT_SEQ = $STAR_CONT_SEQ AND POST_SEQ = $POST_SEQ
+			</puts>
+		</sql>
+		<sql name="starcont.getStarContPostSeqVideoMax_SNS" execute="Select" type="PreparedStatement" desc="">
+			<param name="STAR_CONT_SEQ" 	required="yes" 	desc="" />
+			<puts>
+				SELECT 
+					MAX(POST_SEQ) POST_SEQ 
+				FROM 
+					TB_STAR_CONT_POST 
+				WHERE 
+					STAR_CONT_SEQ = $STAR_CONT_SEQ 
+					AND VIDEO_EXIST_YN = 1
+			</puts>
+		</sql>
+		<sql name="starcont.delStarCont_StarCont" execute="Update" type="PreparedStatement" desc="">
+			<param name="STAR_CONT_SEQ" 	required="yes" 	desc="" />
+			<puts>
+				DELETE FROM TB_STAR_CONT WHERE STAR_CONT_SEQ = $STAR_CONT_SEQ
+			</puts>
+		</sql>
+		<sql name="starcont.delStarContFollowAll_StarCont" execute="Update" type="PreparedStatement" desc="">
+			<param name="STAR_CONT_SEQ" 	required="yes" 	desc="" />
+			<puts>
+				DELETE FROM TB_STAR_CONT_FOLLOW WHERE STAR_CONT_SEQ = $STAR_CONT_SEQ
+			</puts>
+		</sql>
+		<!-- 
+		<sql name="starcont.delStarContTagAll_StarCont" execute="Update" type="PreparedStatement" desc="">
+			<param name="STAR_CONT_SEQ" 	required="yes" 	desc="" />
+			<puts>
+				DELETE FROM TB_STAR_CONT_TAG WHERE STAR_CONT_SEQ = $STAR_CONT_SEQ
+			</puts>
+		</sql>
+		-->
+		<sql name="starcont.delStarContCounter_StarCont" execute="Update" type="PreparedStatement" desc="">
+			<param name="STAR_CONT_SEQ" 	required="yes" 	desc="" />
+			<puts>
+				DELETE FROM TB_STAR_CONT_COUNTER WHERE STAR_CONT_SEQ = $STAR_CONT_SEQ
+			</puts>
+		</sql>
+		<sql name="starcont.delStarContInfo_StarCont" execute="Update" type="PreparedStatement" desc="">
+			<param name="STAR_CONT_SEQ" 	required="yes" 	desc="" />
+			<puts>
+				DELETE FROM TB_POST_INFO WHERE STAR_CONT_SEQ = $STAR_CONT_SEQ
+			</puts>
+		</sql>
+		<sql name="starcont.modStarContCounterSub_StarCont" execute="Update" type="PreparedStatement" desc="스타컨텐츠를 카운터 갱신">
+			<param name="STAR_CONT_SEQ" 	required="yes" 	desc="" />
+			<param name="PIC_CNT" 			required="yes" 	desc="" />
+			<param name="VIDEO_CNT" 		required="yes" 	desc="" />
+			<param name="COMMENT_CNT" 		required="yes" 	desc="" />
+			<param name="HEART_CNT" 		required="yes" 	desc="" />
+			<param name="SMILE_CNT" 		required="yes" 	desc="" />
+			<puts>
+				UPDATE TB_STAR_CONT_COUNTER SET
+					POST_CNT = POST_CNT - 1,
+					PIC_CNT = PIC_CNT - $PIC_CNT,
+					VIDEO_CNT = VIDEO_CNT - $VIDEO_CNT,
+					COMMENT_CNT = COMMENT_CNT - $COMMENT_CNT,
+					HEART_CNT = HEART_CNT - $HEART_CNT,
+					SMILE_CNT = SMILE_CNT - $SMILE_CNT
+				WHERE 
+					STAR_CONT_SEQ = $STAR_CONT_SEQ
+			</puts>
+		</sql>
+		<sql name="starcont.getStarContReprstImgPostSeq_StarCont" execute="Select" type="PreparedStatement" desc="">
+			<param name="STAR_CONT_SEQ" 	required="yes" 	desc="" />
+			<puts>
+				SELECT REPRST_IMG_POST_SEQ FROM TB_POST_INFO WHERE STAR_CONT_SEQ = $STAR_CONT_SEQ
+			</puts>
+		</sql>
+		
+		
+		<sql name="starcont.getNewStarContReprstImgPostSeq_SNS" execute="Select" type="PreparedStatement" desc="">
+			<param name="STAR_CONT_SEQ" 	required="yes" 	desc="" />
+			<puts>
+				SELECT 
+					MAX(POST_SEQ) AS POST_SEQ 
+				FROM 
+					TB_STAR_CONT_POST
+				WHERE 
+					STAR_CONT_SEQ = $STAR_CONT_SEQ
+				AND (PIC_EXIST_YN = 1 OR VIDEO_EXIST_YN = 1)
+			</puts>
+		</sql>
+		<sql name="starcont.getNewStarContReprstImgName_SNS" execute="Select" type="PreparedStatement" desc="">
+			<param name="POST_SEQ" 	required="yes" 	desc="" />
+			<puts>
+				SELECT
+					FILE_NM AS REPRST_IMG_NM,
+					FILE_TYPE
+				FROM
+					TB_FILE_INFO
+				WHERE
+					POST_SEQ = $POST_SEQ
+					AND FILE_NUM = 1
+			</puts>
+		</sql>
+		
+		
+		<sql name="starcont.modStarContReprstInit_StarCont" execute="Update" type="PreparedStatement" desc="">
+			<param name="STAR_CONT_SEQ" 		required="yes" 	desc="" />
+			<param name="REPRST_IMG_NM" 		required="yes" 	desc="" />
+			<param name="FILE_TYPE" 			required="yes" 	desc="" />
+			<puts>
+				UPDATE TB_STAR_CONT SET
+					REPRST_IMG_NM = '$REPRST_IMG_NM',
+					FILE_TYPE = $FILE_TYPE
+				WHERE
+					STAR_CONT_SEQ = $STAR_CONT_SEQ
+			</puts>
+		</sql>		
+		<sql name="starcont.modStarContPostInfoVideoInit_StarCont" execute="Update" type="PreparedStatement" desc="스타컨텐츠의 게시물정보 업데이트">
+			<param name="STAR_CONT_SEQ" 		required="yes" 	desc="" />
+			<param name="LAST_VIDEO_POST_SEQ"	required="yes" 	desc="" />
+			<puts>
+				UPDATE TB_POST_INFO SET
+					LAST_VIDEO_POST_SEQ = $LAST_VIDEO_POST_SEQ
+				WHERE
+					STAR_CONT_SEQ = $STAR_CONT_SEQ
+			</puts>
+		</sql>
+		<sql name="starcont.getStarContFollowAccountpk_SarCont" execute="Select" type="PreparedStatement" desc="">
+			<param name="STAR_CONT_SEQ" 		required="yes" 	desc="" />
+			<puts>
+				SELECT
+					GROUP_CONCAT(ACCOUNTPK) AS STR_ACCOUNTPK
+				FROM
+					TB_STAR_CONT_FOLLOW
+				WHERE
+					STAR_CONT_SEQ = $STAR_CONT_SEQ
+			</puts>
+		</sql>
+		<sql name="starcont.delStarContFollows_SNS" execute="Update" type="PreparedStatement" desc="스타컨텐츠 follows 삭제">
+			<param name="ACCOUNTPK" 		required="yes" 	desc="스타컨텐츠 삭제하는 유저 시퀀스" />
+			<param name="OPT_ACCOUNTPK" 	required="yes" 	desc="" />
+			<puts>
+				DELETE FROM TB_FOLLOW 
+				WHERE ACCOUNTPK = $ACCOUNTPK AND FOLLOW_USER_SEQ IN ($OPT_ACCOUNTPK)	
+			
+			<!--	DELETE FROM TB_FOLLOW 
+					WHERE ACCOUNTPK IN ($OPT_ACCOUNTPK) AND FOLLOW_USER_SEQ = $ACCOUNTPK
+			-->		
+				<!-- 
+				DELETE FROM TB_FOLLOW 
+				WHERE 1=1
+					AND ACCOUNTPK IN (
+						SELECT
+							ACCOUNTPK
+						FROM
+							TB_STAR_CONT_POST
+						WHERE
+							STAR_CONT_SEQ = $STAR_CONT_SEQ
+						) 
+					AND FOLLOW_USER_SEQ = $ACCOUNTPK
+				-->
+			</puts>
+		</sql>	
+		<sql name="starcont.delStarContFollowers_SNS" execute="Update" type="PreparedStatement" desc="스타컨텐츠 followers 삭제">
+			<param name="ACCOUNTPK" 		required="yes" 	desc="스타컨텐츠 삭제하는 유저 시퀀스" />
+			<param name="OPT_ACCOUNTPK" 	required="yes" 	desc="" />
+			<puts>
+				DELETE FROM TB_FOLLOWER 
+				WHERE ACCOUNTPK IN ($OPT_ACCOUNTPK) AND FOLLOWER_USER_SEQ IN ($ACCOUNTPK)				
+				<!-- 
+				DELETE FROM TB_FOLLOWER 
+					WHERE ACCOUNTPK = $ACCOUNTPK AND FOLLOWER_USER_SEQ IN ($OPT_ACCOUNTPK)
+				 -->
+				<!-- 
+				DELETE FROM TB_FOLLOWER 
+				WHERE 1=1
+					AND ACCOUNTPK = $ACCOUNTPK
+					AND FOLLOWER_USER_SEQ IN (
+						SELECT
+							ACCOUNTPK
+						FROM
+							TB_STAR_CONT_POST
+						WHERE
+							STAR_CONT_SEQ = $STAR_CONT_SEQ
+						)
+				-->			
+			</puts>
+		</sql>
+		
+		<!--
+		<sql name="starcont.getTagNm_Game" execute="Select" type="PreparedStatement" desc="">
+			<param name="ID" 	required="yes" 	desc="" />
+			<puts>
+				SELECT INTEREST_NM FROM B_INTEREST WHERE ID = $ID
+			</puts>
+		</sql>
+		-->
+		<sql name="starcont.getTagSeq_SNS" execute="Select" type="PreparedStatement" desc="">
+			<param name="TAG_NM" 	required="yes" 	desc="" />
+			<puts>
+				SELECT TAG_SEQ FROM TB_TAG WHERE TAG_NM = '$TAG_NM'
+			</puts>
+		</sql>		
+		<sql name="starcont.delTagPost_SNS" execute="Update" type="PreparedStatement" desc="">
+			<param name="POST_SEQ" 		required="yes" 	desc="" />
+			<param name="TAG_SEQ" 		required="yes" 	desc="" />
+			<puts>
+				<!-- DELETE FROM TB_TAG_POST WHERE SEQ IN (SELECT SEQ FROM TB_TAG_POST WHERE POST_SEQ = $POST_SEQ AND TAG_SEQ = $TAG_SEQ AND CNT = 1) -->
+				DELETE FROM TB_TAG_POST WHERE POST_SEQ = $POST_SEQ AND TAG_SEQ = $TAG_SEQ AND CNT = 1
+			</puts>
+		</sql>
+		<sql name="starcont.modTagPostMinusCnt_SNS" execute="Update" type="PreparedStatement" desc="">
+			<param name="POST_SEQ" 		required="yes" 	desc="" />
+			<param name="TAG_SEQ" 		required="yes" 	desc="" />
+			<puts>
+				<!-- UPDATE TB_TAG_POST SET CNT = CNT + ($VAL) WHERE SEQ IN (SELECT SEQ FROM TB_TAG_POST WHERE POST_SEQ = $POST_SEQ AND TAG_SEQ = $TAG_SEQ) -->
+				UPDATE TB_TAG_POST SET 
+					CNT = CNT -1 
+				WHERE 
+					POST_SEQ = $POST_SEQ 
+					AND TAG_SEQ = $TAG_SEQ
+			</puts>
+		</sql>
+		<sql name="starcont.modTagMinusCnt_SNS" execute="Update" type="PreparedStatement" desc="">
+			<param name="TAG_SEQ" 		required="yes" 	desc="" />
+			<puts>
+				UPDATE TB_TAG SET
+					POST_CNT = POST_CNT - 1
+				WHERE
+					TAG_SEQ = $TAG_SEQ
+					AND POST_CNT > 0			
+			</puts>
+		</sql>
+		
+		
+		
+
+<!-- listInterest -->
+		<sql name="starcont.getInterestUser_Game" execute="Select" type="PreparedStatement" desc="">
+			<puts>
+				SELECT
+					ID,
+					INTEREST_NM
+				FROM
+					<!-- B_INTEREST_USER -->
+					B_INTEREST
+				WHERE 1=1
+					AND GROUP_ID = 1
+			</puts>
+		</sql>
+		<sql name="starcont.getInterestStarCont_Game" execute="Select" type="PreparedStatement" desc="">
+			<puts>
+				SELECT
+					ID,
+					INTEREST_NM
+				FROM
+					<!-- B_INTEREST_STAR_CONT -->
+					B_INTEREST
+				WHERE 1=1
+					AND GROUP_ID = 1
+			</puts>
+		</sql>
+		
+<!--  listSumNailStarContents4jqGrid -->		
+		<sql name="starcont.sumNaillistStarContTotalCnt" execute="Select" type="PreparedStatement" desc="섬네일 리스트 개수">
+			<puts>
+				SELECT
+					COUNT(STAR_CONT_POST_SEQ) AS CNT
+				FROM
+					TB_STAR_CONT_POST
+				WHERE
+					STAR_CONT_SEQ = :STAR_CONT_SEQ
+					AND (PIC_EXIST_YN = 1 OR VIDEO_EXIST_YN = 1)
+			</puts>
+		</sql>
+		<sql name="starcont.pagePostSeqThumbNailStarCont_SNS" execute="Select" type="PreparedStatement" desc="페이지단위 게시물 시퀀스 얻기">
+			<param name="STAR_CONT_SEQ" 	required="yes" 	desc="게시물 검색할 유저 시퀀스" />
+			<param name="OFFSET" 			required="yes" 	desc="" />
+			<param name="ROWS" 				required="yes" 	desc="" />
+			<puts>
+				SELECT
+					GROUP_CONCAT(B.POST_SEQ ORDER BY B.STAR_CONT_POST_SEQ DESC) AS STR_POST_SEQ
+				FROM
+					(
+					SELECT
+						A.*
+					FROM
+						(
+						SELECT
+							POST_SEQ,STAR_CONT_POST_SEQ
+						FROM
+							TB_STAR_CONT_POST
+						WHERE
+							STAR_CONT_SEQ = $STAR_CONT_SEQ
+							AND (PIC_EXIST_YN = 1 OR VIDEO_EXIST_YN = 1)
+						) A
+					LIMIT $OFFSET, $ROWS
+					) B
+			</puts>
+		</sql>
+		<sql name="starcont.sumNailListStarCont4jqGrid" execute="Select" type="PreparedStatement" desc="섬네일 리스트 조회">
+			<param name="POST_SEQ" 			required="yes" 	desc="유저시퀀스" />
+			<puts>
+				SELECT
+					B.ACCOUNTPK,
+					A.*,
+					B.PIC_CNT,
+					B.VIDEO_CNT
+				FROM
+					(
+					SELECT
+						POST_SEQ,
+						FILE_NM,
+						FILE_TYPE 
+					FROM 
+						TB_FILE_INFO
+					WHERE 
+						POST_SEQ IN ($POST_SEQ)
+						AND FILE_NUM = 1
+					) A
+					LEFT OUTER JOIN
+					TB_POST B
+					ON A.POST_SEQ = B.POST_SEQ
+					ORDER BY FIELD(A.POST_SEQ, $POST_SEQ)
+				<!--  ORDER BY A.POST_SEQ DESC-->
+			</puts>	
+		</sql>		
+		
+<!-- getStarContents -->
+		<sql name="starcont.getStarContents_StarCont" execute="Select" type="PreparedStatement" desc="스타컨텐츠 정보를 얻는다.">
+			<param name="STAR_CONT_SEQ" 		required="yes" 	desc="" />
+			<puts>
+				SELECT
+					ACCOUNTPK,
+					STAR_CONT_SEQ,
+					STAR_CONT_NM,
+					STAR_CONT_DES,
+					URL
+				FROM
+					TB_STAR_CONT
+				WHERE 1=1
+					AND STAR_CONT_SEQ = $STAR_CONT_SEQ
+			</puts>
+		</sql>
+		
+	</module>
+</sqlm>

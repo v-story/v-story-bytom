@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlm SYSTEM "http://10.95.26.153/dtd/sqlm_2_1.dtd" [
+]>
+<sqlm   ver="2.1">
+	<module name="snsquest" desc="SNSQuest">
+		<sql name="snsquest.getSNSQuest_SNS" execute="Select" type="PreparedStatement" desc="">
+			<param name="ACCOUNTPK" 		required="yes" 	desc="" />
+			<param name="FRIENDACCOUNTPK" 	required="yes" 	desc="" />
+			<param name="QUESTID" 			required="yes" 	desc="" />
+			<param name="CONDTYPE" 			required="yes" 	desc="" />
+			<puts>
+				SELECT 
+					COUNT(*) 
+				FROM 
+					TB_SNSQUEST_COND
+				WHERE ACCOUNTPK = $ACCOUNTPK AND TEAM_ACCOUNTPK = $FRIENDACCOUNTPK AND QUEST_ID = $QUESTID AND COND_TYPE = $CONDTYPE
+			</puts>
+		</sql>	
+		
+		<sql name="snsquest.regSNSQuest_SNS" execute="Update" type="PreparedStatement" desc="">
+			<param name="ACCOUNTPK" 		required="yes" 	desc="" />
+			<param name="FRIENDACCOUNTPK" 	required="yes" 	desc="" />
+			<param name="QUESTID" 			required="yes" 	desc="" />
+			<param name="CONDTYPE" 			required="yes" 	desc="" />
+			<puts>
+				INSERT INTO TB_SNSQUEST_COND
+					(ACCOUNTPK, TEAM_ACCOUNTPK, QUEST_ID, COND_TYPE, REG_DATE)
+				VALUES
+					($ACCOUNTPK, $FRIENDACCOUNTPK, $QUESTID, $CONDTYPE, NOW())
+			</puts>
+		</sql>	
+	</module>
+</sqlm>

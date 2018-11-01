@@ -1,0 +1,437 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlm SYSTEM "http://10.95.26.153/dtd/sqlm_2_1.dtd" [
+]>
+<sqlm   ver="2.1">
+	<module name="todo" desc="quest">
+		<sql name="todo.StarContentsTopSelect" execute="Select" type="PreparedStatement" desc="StarContentsTopSelect">
+			<param name="ACCOUNTPK"	required="yes" 	desc="" />
+			<puts>
+				SELECT 
+					b.STAR_CONT_SEQ, 
+					FILE_TYPE,
+					CASE WHEN (FILE_TYPE=2) THEN F_THUMBNAIL_FILE(FILE_NM) WHEN (FILE_TYPE=3) THEN  'video_default.png' ELSE FILE_NM END FILE_NM
+				FROM FUNFACTORY_SNS.TB_POST a, FUNFACTORY_SNS.TB_STAR_CONT_POST b, FUNFACTORY_SNS.TB_FILE_INFO c
+				WHERE a.ACCOUNTPK = $ACCOUNTPK AND a.POST_SEQ = b.POST_SEQ AND a.POST_SEQ = c.POST_SEQ
+				ORDER BY (a.COMMENT_CNT*35 + a.HEART_CNT*15 + a.SMILE_CNT*50) DESC
+				LIMIT 3
+			</puts>
+		</sql>
+		<sql name="todo.UserCurrencyPlus" execute="Update" type="PreparedStatement" desc="UserCurrencyPlus">
+			<param name="ACCOUNTPK"	required="yes" 	desc="" />
+			<param name="STAR_CNT"	required="yes" 	desc="" />
+			<param name="GOLD_CNT"	required="yes" 	desc="" />
+			<param name="RUBY_CNT"	required="yes" 	desc="" />
+			<param name="HEART_CNT"	required="yes" 	desc="" />
+			<param name="COIN_CNT"	required="yes" 	desc="" />
+			<param name="SMILE_CNT"	required="yes" 	desc="" />
+			<param name="RUBY_FREE_CNT"	required="yes" 	desc="" />
+			<param name="SMILE_FREE_CNT"	required="yes" 	desc="" />
+			<puts>
+				UPDATE TB_CURRENCY_INFO
+				SET STAR_CNT = STAR_CNT + $STAR_CNT,
+					GOLD_CNT = GOLD_CNT + $GOLD_CNT,
+					RUBY_CNT = RUBY_CNT + $RUBY_CNT,
+					HEART_CNT = HEART_CNT + $HEART_CNT,
+					COIN_CNT = COIN_CNT + $COIN_CNT,
+					SMILE_CNT = SMILE_CNT + $SMILE_CNT,
+					RUBY_FREE_CNT = RUBY_FREE_CNT + $RUBY_FREE_CNT,
+					SMILE_FREE_CNT = SMILE_FREE_CNT + $SMILE_FREE_CNT
+				WHERE ACCOUNTPK = $ACCOUNTPK
+			</puts>
+		</sql>
+		<sql name="todo.UserCurrencyMinus" execute="Update" type="PreparedStatement" desc="UserCurrencyMinus">
+			<param name="ACCOUNTPK"	required="yes" 	desc="" />
+			<param name="STAR_CNT"	required="yes" 	desc="" />
+			<param name="GOLD_CNT"	required="yes" 	desc="" />
+			<param name="RUBY_CNT"	required="yes" 	desc="" />
+			<param name="HEART_CNT"	required="yes" 	desc="" />
+			<param name="COIN_CNT"	required="yes" 	desc="" />
+			<param name="SMILE_CNT"	required="yes" 	desc="" />
+			<param name="RUBY_FREE_CNT"	required="yes" 	desc="" />
+			<param name="SMILE_FREE_CNT"	required="yes" 	desc="" />
+			<puts>
+				UPDATE TB_CURRENCY_INFO
+				SET STAR_CNT = STAR_CNT - $STAR_CNT,
+					GOLD_CNT = GOLD_CNT - $GOLD_CNT,
+					RUBY_CNT = RUBY_CNT - $RUBY_CNT,
+					HEART_CNT = HEART_CNT - $HEART_CNT,
+					COIN_CNT = COIN_CNT - $COIN_CNT,
+					SMILE_CNT = SMILE_CNT - $SMILE_CNT,
+					RUBY_FREE_CNT = RUBY_FREE_CNT - $RUBY_FREE_CNT,
+					SMILE_FREE_CNT = SMILE_FREE_CNT - $SMILE_FREE_CNT
+				WHERE ACCOUNTPK = $ACCOUNTPK
+			</puts>
+		</sql>
+		<sql name="todo.UserCurrencyUpdate" execute="Update" type="PreparedStatement" desc="UserCurrencyUpdate">
+			<param name="ACCOUNTPK"	required="yes" 	desc="" />
+			<param name="STAR_CNT"	required="yes" 	desc="" />
+			<param name="GOLD_CNT"	required="yes" 	desc="" />
+			<param name="RUBY_CNT"	required="yes" 	desc="" />
+			<param name="HEART_CNT"	required="yes" 	desc="" />
+			<param name="COIN_CNT"	required="yes" 	desc="" />
+			<param name="SMILE_CNT"	required="yes" 	desc="" />
+			<param name="RUBY_FREE_CNT"	required="yes" 	desc="" />
+			<param name="SMILE_FREE_CNT"	required="yes" 	desc="" />
+			<puts>
+				UPDATE TB_CURRENCY_INFO
+				SET STAR_CNT	= $STAR_CNT,
+					GOLD_CNT	= $GOLD_CNT,
+					RUBY_CNT	= $RUBY_CNT,
+					HEART_CNT	= $HEART_CNT,
+					COIN_CNT	= $COIN_CNT,
+					SMILE_CNT	= $SMILE_CNT,
+					RUBY_FREE_CNT = $RUBY_FREE_CNT,
+					SMILE_FREE_CNT = $SMILE_FREE_CNT
+				WHERE ACCOUNTPK = $ACCOUNTPK
+			</puts>
+		</sql>
+		<sql name="todo.UserCurrencySelect" execute="Select" type="PreparedStatement" desc="UserCurrencySelect">
+			<param name="ACCOUNTPK"	required="yes" 	desc="" />
+			<puts>
+				SELECT
+					STAR_CNT,
+					GOLD_CNT,
+					RUBY_CNT,
+					HEART_CNT,
+					COIN_CNT,
+					SMILE_CNT,
+					RUBY_FREE_CNT,
+					SMILE_FREE_CNT
+				FROM  TB_CURRENCY_INFO
+				WHERE ACCOUNTPK = $ACCOUNTPK
+			</puts>
+		</sql>
+		<sql name="todo.PollFromScoreUpdate" execute="Update" type="PreparedStatement" desc="PollFromScoreUpdate">
+			<param name="POLL_SEQ"	required="yes" 	desc="" />
+			<param name="FROM_SCORE"	required="yes" 	desc="" />
+			<param name="STATE"	required="yes" 	desc="" />
+			<puts>
+				UPDATE TB_POLL SET FROM_SCORE = $FROM_SCORE, STATE = $STATE WHERE POLL_SEQ = $POLL_SEQ
+			</puts>
+		</sql>	
+		<sql name="todo.PollInsert" execute="Update" type="PreparedStatement" desc="PollInsert">
+			<param name="ACCOUNTPK"	required="yes" 	desc="" />
+			<param name="B_POLL_SEQ"	required="yes" 	desc="" />
+			<puts>
+				INSERT INTO TB_POLL(ACCOUNTPK, B_POLL_SEQ, STATE, FROM_ACCOUNTPK, SELECT_REWARD, FROM_SCORE)
+					VALUES ($ACCOUNTPK, $B_POLL_SEQ, 1, 0, 0, 0)
+			</puts>
+		</sql>
+		<sql name="todo.PollSuggestInsert" execute="Update" type="PreparedStatement" desc="PollSuggestInsert">
+			<param name="TENDENCY"	required="yes" 	desc="" />
+			<param name="TO_ACCOUNTPK"	required="yes" 	desc="" />
+			<param name="FROM_ACCOUNTPK"	required="yes" 	desc="" />
+			<param name="FROM_SCORE"	required="yes" 	desc="" />
+			<puts>
+				INSERT INTO TB_POLL_SUGGEST(TENDENCY, TO_ACCOUNTPK, FROM_ACCOUNTPK, TO_SCORE, FROM_SCORE, LIMIT_TIME)
+				VALUES($TENDENCY, $TO_ACCOUNTPK, $FROM_ACCOUNTPK, 0, $FROM_SCORE, DATE_FORMAT(DATE_ADD(NOW(),interval 7 day), '%Y-%m-%d 00:00:00'))
+			</puts>
+		</sql>
+		<sql name="todo.PollSuggestResUpdate" execute="Update" type="PreparedStatement" desc="PollSuggestResUpdate">
+			<param name="POLL_SUGGEST_SEQ"	required="yes" 	desc="" />
+			<param name="TO_SCORE"	required="yes" 	desc="" />
+			<puts>	
+				UPDATE TB_POLL_SUGGEST SET TO_SCORE = $TO_SCORE, LIMIT_TIME = DATE_FORMAT(DATE_ADD(NOW(),interval 7 day), '%Y-%m-%d 00:00:00')
+				WHERE POLL_SUGGEST_SEQ = $POLL_SUGGEST_SEQ AND TO_SCORE = 0
+			</puts>
+		</sql>
+		<sql name="todo.PollSuggestSelectAll" execute="Select" type="PreparedStatement" desc="PollSuggestTarSelect">
+			<param name="TO_ACCOUNTPK"	required="yes" 	desc="" />
+			<param name="FROM_ACCOUNTPK"	required="yes" 	desc="" />
+			<param name="TENDENCY"	required="yes" 	desc="" />
+			<puts>
+				SELECT 
+					POLL_SUGGEST_SEQ
+				FROM FUNFACTORY_GAME.TB_POLL_SUGGEST
+				WHERE LIMIT_TIME > NOW() AND TENDENCY = $TENDENCY
+				AND ((FROM_ACCOUNTPK = $FROM_ACCOUNTPK and TO_ACCOUNTPK = $TO_ACCOUNTPK) or (FROM_ACCOUNTPK = $TO_ACCOUNTPK and TO_ACCOUNTPK = $FROM_ACCOUNTPK))
+			</puts>
+		</sql>
+		<sql name="todo.PollWaitSelect" execute="Select" type="PreparedStatement" desc="PollWaitSelect">
+			<param name="STR_POLL_SEQ"			required="yes" 	desc="" />
+			<puts>
+				SELECT 
+					POLL_SEQ, 
+					B_POLL_SEQ, 
+					FROM_ACCOUNTPK
+				FROM TB_POLL 
+				WHERE POLL_SEQ IN($STR_POLL_SEQ) AND STATE = 3;
+			</puts>
+		</sql>
+		
+		<sql name="todo.getPoll" execute="Select" type="PreparedStatement" desc="getPoll">
+			<param name="ACCOUNTPK"	required="yes" 	desc="" />
+			<puts>
+				SELECT 
+					a.POLL_SEQ
+					,a.B_POLL_SEQ
+					,a.STATE
+					,a.FROM_ACCOUNTPK
+					,a.FROM_SCORE
+					,a.SELECT_REWARD
+					,b.POLL_NAME
+					,TIMESTAMPDIFF( SECOND, NOW(), b.END_DATE) AS 'ENDTIME'
+				FROM TB_POLL a, B_POLL b
+				WHERE a.ACCOUNTPK = $ACCOUNTPK AND a.B_POLL_SEQ = b.SEQ AND b.END_DATE > NOW()
+			</puts>
+		</sql>
+		<sql name="todo.getPollSeq" execute="Select" type="PreparedStatement" desc="getPollSeq">
+			<param name="POLL_SEQ"	required="yes" 	desc="" />
+			<puts>
+				SELECT 
+					a.POLL_SEQ
+					,a.B_POLL_SEQ
+					,a.STATE
+					,a.FROM_ACCOUNTPK
+					,a.FROM_SCORE
+					,a.SELECT_REWARD
+					,b.POLL_NAME
+					,TIMESTAMPDIFF( SECOND, NOW(), b.END_DATE) AS 'ENDTIME'
+				FROM TB_POLL a, B_POLL b
+				WHERE a.POLL_SEQ = $POLL_SEQ AND a.B_POLL_SEQ = b.SEQ AND b.END_DATE > NOW()
+			</puts>
+		</sql>
+		<sql name="todo.getPollSub" execute="Select" type="PreparedStatement" desc="getPollSub">
+			<param name="POLL_SEQ"	required="yes" 	desc="" />
+			<puts>
+				SELECT 
+					POLL_SEQ,
+					POLL_KEY_VALUE
+				FROM TB_POLL_SUB
+				WHERE POLL_SEQ = $POLL_SEQ
+			</puts>
+		</sql>
+		<sql name="todo.getPollSubTop" execute="Select" type="PreparedStatement" desc="getPollSubAll">
+			<param name="STR_POLL_SEQ"	required="yes" 	desc="" />
+			<puts>
+				SELECT 
+					POLL_SEQ, 
+					MAX(POLL_KEY_VALUE) AS POLL_KEY_VALUE
+				FROM TB_POLL_SUB
+				WHERE POLL_SEQ IN ($STR_POLL_SEQ)
+				GROUP BY POLL_SEQ
+				ORDER BY POLL_SEQ DESC
+			</puts>
+		</sql>
+		<sql name="todo.UserSelectArray" execute="Select" type="PreparedStatement" desc="UserSelectArray">
+			<param name="STR_ACCOUNTPK"	required="yes" 	desc="" />
+			<puts>
+				SELECT
+					A.ACCOUNTPK,
+					A.ID,
+					A.PROF_PIC_NM,
+					A.AVATAR_CD,
+					A.GENDER,
+					A.INTRODUCE,
+					1 + YEAR(NOW()) - A.BIRTHYEAR AS AGE
+				FROM  FUNFACTORY_SNS.TB_USER A 
+				WHERE A.ACCOUNTPK IN($STR_ACCOUNTPK)
+			</puts>
+		</sql>
+		<sql name="todo.UserSelect" execute="Select" type="PreparedStatement" desc="UserSelect">
+			<param name="ACCOUNTPK"	required="yes" 	desc="" />
+			<puts>
+				SELECT
+					A.ACCOUNTPK,
+					A.ID,
+					A.PROF_PIC_NM,
+					A.AVATAR_CD,
+					A.GENDER,
+					A.INTRODUCE,
+					1 + YEAR(NOW()) - A.BIRTHYEAR AS AGE
+				FROM  FUNFACTORY_SNS.TB_USER A 
+				WHERE A.ACCOUNTPK =$ACCOUNTPK;
+			</puts>
+		</sql>
+		<sql name="todo.getPollSuggest" execute="Select" type="PreparedStatement" desc="getPollSuggestObj">
+			<param name="ACCOUNTPK"	required="yes" 	desc="" />
+			<puts>
+				SELECT 
+					a.POLL_SUGGEST_SEQ,
+					a.TENDENCY,
+					a.TO_ACCOUNTPK,
+					a.FROM_ACCOUNTPK, 
+					a.TO_SCORE, 
+					a.FROM_SCORE, 
+					TIMESTAMPDIFF( SECOND, NOW(), a.LIMIT_TIME) AS 'LIMIT_TIME_next',
+					b.PROF_PIC_NM,
+					b.INTRODUCE,
+                    c.ID
+				FROM TB_POLL_SUGGEST a, TB_SNS_USER_INFO b, TB_USER c
+				WHERE ((a.TO_ACCOUNTPK = $ACCOUNTPK AND a.FROM_ACCOUNTPK = b.ACCOUNTPK AND a.FROM_ACCOUNTPK = c.ACCOUNTPK) 
+                or (a.FROM_ACCOUNTPK = $ACCOUNTPK AND a.TO_ACCOUNTPK = b.ACCOUNTPK AND a.TO_ACCOUNTPK = c.ACCOUNTPK)) 
+					AND a.LIMIT_TIME > NOW()
+			</puts>
+		</sql>
+		<sql name="todo.getPollSuggest1" execute="Select" type="PreparedStatement" desc="getPollSuggestObj1">
+			<param name="TO_ACCOUNTPK"	required="yes" 	desc="" />
+			<param name="FROM_ACCOUNTPK"	required="yes" 	desc="" />
+			<param name="TENDENCY"	required="yes" 	desc="" />
+			<puts>
+				SELECT 
+					a.POLL_SUGGEST_SEQ,
+					a.TENDENCY,
+					a.TO_ACCOUNTPK,
+					a.FROM_ACCOUNTPK, 
+					a.TO_SCORE, 
+					a.FROM_SCORE, 
+					TIMESTAMPDIFF( SECOND, NOW(), a.LIMIT_TIME) AS 'LIMIT_TIME_next',
+					b.PROF_PIC_NM,
+					b.INTRODUCE,
+                    c.ID
+				FROM TB_POLL_SUGGEST a, TB_SNS_USER_INFO b, TB_USER c
+				WHERE ((a.TO_ACCOUNTPK = $TO_ACCOUNTPK AND a.FROM_ACCOUNTPK = $FROM_ACCOUNTPK AND a.FROM_ACCOUNTPK = b.ACCOUNTPK AND a.FROM_ACCOUNTPK = c.ACCOUNTPK) 
+                or (a.TO_ACCOUNTPK = $FROM_ACCOUNTPK AND a.FROM_ACCOUNTPK = $TO_ACCOUNTPK AND a.TO_ACCOUNTPK = b.ACCOUNTPK AND a.TO_ACCOUNTPK = c.ACCOUNTPK)) 
+					AND a.LIMIT_TIME > NOW() AND a.TENDENCY = $TENDENCY
+			</puts>
+		</sql>
+		<sql name="todo.getPollSuggest2" execute="Select" type="PreparedStatement" desc="getPollSuggest2">
+			<param name="POLL_SUGGEST_SEQ"	required="yes" 	desc="" />
+			<puts>
+				SELECT 
+					a.POLL_SUGGEST_SEQ,
+					a.TENDENCY,
+					a.TO_ACCOUNTPK,
+					a.FROM_ACCOUNTPK, 
+					a.TO_SCORE, 
+					a.FROM_SCORE, 
+					TIMESTAMPDIFF( SECOND, NOW(), a.LIMIT_TIME) AS 'LIMIT_TIME_next',
+					b.PROF_PIC_NM,
+					b.INTRODUCE,
+                    c.ID
+				FROM TB_POLL_SUGGEST a, TB_SNS_USER_INFO b, TB_USER c
+				WHERE a.POLL_SUGGEST_SEQ = $POLL_SUGGEST_SEQ AND a.FROM_ACCOUNTPK = b.ACCOUNTPK AND a.FROM_ACCOUNTPK = c.ACCOUNTPK AND a.LIMIT_TIME > NOW()
+			</puts>
+		</sql>
+		<sql name="todo.getTodoQuest" execute="Select" type="PreparedStatement" desc="getTodoQuest">
+			<param name="ACCOUNTPK"	required="yes" 	desc="" />
+			<puts>
+				SELECT A.USER_DAY_QUEST_SEQ, A.QUEST_ID, A.QUEST_STEP, A.QUEST_CNT, A.LIMIT_TIME_next
+				FROM
+				(
+					SELECT
+						USER_DAY_QUEST_SEQ,
+						QUEST_ID, 
+                        QUEST_STEP, 
+                        QUEST_CNT, 
+                        TIMESTAMPDIFF( SECOND, NOW(), LIMIT_TIME) AS 'LIMIT_TIME_next'
+					FROM TB_USER_DAY_QUEST 
+					WHERE ACCOUNTPK = $ACCOUNTPK AND LIMIT_TIME > NOW()
+				) A	   	   
+				UNION
+				SELECT A.USER_DAY_QUEST_SEQ, A.QUEST_ID, A.QUEST_STEP, A.QUEST_CNT, A.LIMIT_TIME_next
+				FROM
+				(
+					SELECT
+						0 AS USER_DAY_QUEST_SEQ,
+						QUEST_ID, 
+                        0 AS QUEST_STEP, 
+                        0 AS QUEST_CNT, 
+                        TIMESTAMPDIFF( SECOND, NOW(), DATE_FORMAT(DATE_ADD(NOW(),interval 1 day), '%Y-%m-%d 00:00:00')) AS 'LIMIT_TIME_next' 
+					FROM B_DAY_TODO
+                    WHERE QUEST_ID NOT IN (SELECT QUEST_ID FROM TB_USER_DAY_QUEST WHERE ACCOUNTPK = $ACCOUNTPK AND LIMIT_TIME > NOW())
+				) A
+			</puts>
+		</sql>
+		<sql name="todo.getTodoQuest1" execute="Select" type="PreparedStatement" desc="getTodoQuest1">
+			<param name="QUEST_ID"	required="yes" 	desc="" />
+			<param name="ACCOUNTPK"	required="yes" 	desc="" />
+			<puts>
+				SELECT
+					USER_DAY_QUEST_SEQ,
+					QUEST_ID, 
+					QUEST_STEP, 
+					QUEST_CNT, 
+					TIMESTAMPDIFF( SECOND, NOW(), LIMIT_TIME) AS 'LIMIT_TIME_next'
+				FROM TB_USER_DAY_QUEST 
+				WHERE QUEST_ID = $QUEST_ID AND ACCOUNTPK = $ACCOUNTPK AND LIMIT_TIME > NOW()
+			</puts>
+		</sql>
+		<sql name="todo.regTodoQuestObjCnt" execute="Update" type="PreparedStatement" desc="regTodoQuestObjCnt">
+			<param name="USER_DAY_QUEST_SEQ"	required="yes" 	desc="" />
+			<param name="ACCOUNTPK"	required="yes" 	desc="" />
+			<param name="QUEST_STEP" required="yes" 	desc="" />
+			<param name="QUEST_CNT"	required="yes" 	desc="" />
+			<puts>
+				UPDATE  TB_USER_DAY_QUEST 
+				SET QUEST_STEP = $QUEST_STEP, QUEST_CNT = $QUEST_CNT
+				WHERE USER_DAY_QUEST_SEQ = $USER_DAY_QUEST_SEQ AND ACCOUNTPK = $ACCOUNTPK;
+			</puts>
+		</sql>
+		<sql name="todo.regTodoQuestObjCnt1" execute="Update" type="PreparedStatement" desc="regTodoQuestObjCnt1">
+			<param name="ACCOUNTPK"	required="yes" 	desc="" />
+			<param name="QUEST_ID"	required="yes" 	desc="" />
+			<param name="QUEST_STEP" required="yes" 	desc="" />
+			<param name="QUEST_CNT"	required="yes" 	desc="" />
+			<puts>
+				INSERT INTO TB_USER_DAY_QUEST(ACCOUNTPK, QUEST_ID, QUEST_STEP, QUEST_CNT, LIMIT_TIME)
+				VALUES($ACCOUNTPK, $QUEST_ID, $QUEST_STEP, $QUEST_CNT, DATE_FORMAT(DATE_ADD(NOW(),interval 1 day), '%Y-%m-%d 00:00:00'))
+			</puts>
+		</sql>
+		<sql name="todo.regTodoQuestObjReward" execute="Update" type="PreparedStatement" desc="regTodoQuestObjReward">
+			<param name="USER_DAY_QUEST_SEQ"	required="yes" 	desc="" />
+			<param name="ACCOUNTPK"	required="yes" 	desc="" />
+			<puts>
+				UPDATE  TB_USER_DAY_QUEST 
+				SET QUEST_STEP = 3
+				WHERE USER_DAY_QUEST_SEQ = $USER_DAY_QUEST_SEQ AND QUEST_STEP = 2 AND ACCOUNTPK = $ACCOUNTPK;
+			</puts>
+		</sql>
+		<sql name="todo.UpdatePollEnter" execute="Update" type="PreparedStatement" desc="UpdatePollEnter">
+			<param name="POLL_SEQ"	required="yes" 	desc="" />
+			<param name="POLL_KEY_VALUE"	required="yes" 	desc="" />
+			<puts>
+				INSERT INTO TB_POLL_SUB(POLL_SEQ, POLL_KEY_VALUE) VALUES($POLL_SEQ, $POLL_KEY_VALUE);
+			</puts>
+		</sql>
+		<sql name="todo.GetPollInfo1" execute="Select" type="PreparedStatement" desc="GetPollInfo1">
+			<param name="POLL_SEQ"	required="yes" 	desc="" />
+			<puts>
+				SELECT 
+					POLL_SEQ,
+					STATE,
+					SELECT_REWARD,
+					TO_ACCOUNTPK,
+					FROM_ACCOUNTPK,
+					TO_SCORE,
+					FROM_SCORE
+				FROM FUNFACTORY_GAME.TB_POLL 
+				WHERE POLL_SEQ = $POLL_SEQ
+			</puts>
+		</sql>
+		<sql name="todo.GetPollInfo2" execute="Select" type="PreparedStatement" desc="GetPollInfo2">
+			<param name="POLL_SEQ"	required="yes" 	desc="" />
+			<puts>
+				SELECT 
+					POLL_SEQ, 
+					POLL_KEY_VALUE
+				FROM TB_POLL_SUB WHERE POLL_SEQ = $POLL_SEQ
+				ORDER BY POLL_SEQ, POLL_KEY_VALUE
+			</puts>
+		</sql>
+		<sql name="todo.regUpdatePollComplete" execute="Update" type="PreparedStatement" desc="regUpdatePollComplete">
+			<param name="POLL_SEQ"	required="yes" 	desc="" />
+			<puts>
+				UPDATE TB_POLL SET STATE = 2 WHERE POLL_SEQ = $POLL_SEQ AND STATE = 1
+			</puts>
+		</sql>
+		<sql name="todo.UpdatePollReward" execute="Update" type="PreparedStatement" desc="UpdatePollReward">
+			<param name="POLL_SEQ"	required="yes" 	desc="" />
+			<param name="SELECT_REWARD"	required="yes" 	desc="" />
+			<puts>
+				UPDATE TB_POLL SET SELECT_REWARD = $SELECT_REWARD, STATE = 3 WHERE POLL_SEQ = $POLL_SEQ AND STATE = 4 
+			</puts>
+		</sql>
+		<sql name="todo.GetPollSuggestInfo" execute="Select" type="PreparedStatement" desc="GetPollSuggestInfo">
+			<param name="POLL_SUGGEST_SEQ"	required="yes" 	desc="" />
+			<puts>
+				SELECT 
+					POLL_SUGGEST_SEQ, 
+					TO_ACCOUNTPK, 
+					FROM_ACCOUNTPK
+				FROM TB_POLL_SUGGEST
+				WHERE LIMIT_TIME > NOW() and POLL_SUGGEST_SEQ = $POLL_SUGGEST_SEQ
+			</puts>
+		</sql>
+	</module>
+</sqlm>

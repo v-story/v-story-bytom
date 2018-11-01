@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlm SYSTEM "http://10.95.26.153/dtd/sqlm_2_1.dtd" [
+]>
+<sqlm   ver="2.1">
+	<module name="store" desc="오브젝트정보">
+		<sql name="store.getHoldCategoryList" execute="Select" type="PreparedStatement" desc="보유카테고리 가져오기">
+			<param name="ACCOUNTPK"			required="yes" 	desc="계정PK" />
+			<puts>
+				SELECT HOLD_CATE_SEQ, ACCOUNTPK, CATE_ID, SLOT_CNT FROM TB_HOLD_CATE WHERE ACCOUNTPK = $ACCOUNTPK	
+			</puts>
+		</sql>			
+		<sql name="store.getHoldCategorySlotCnt" execute="Select" type="PreparedStatement" desc="보유카테고리 슬롯개수 조회">
+			<param name="ACCOUNTPK"			required="yes" 	desc="계정PK" />
+			<param name="CATE_ID"			required="yes" 	desc="카테고리 아이디" />
+			<puts>
+				SELECT  SLOT_CNT FROM TB_HOLD_CATE 
+				WHERE ACCOUNTPK = $ACCOUNTPK AND CATE_ID = $CATE_ID
+			</puts>
+		</sql>			
+		<sql name="store.modHoldCategorySlotCnt" execute="Select" type="PreparedStatement" desc="보유카테고리 슬롯갯수수정">
+			<param name="ACCOUNTPK"			required="yes" 	desc="계정PK" />
+			<param name="CATE_ID"			required="yes" 	desc="카테고리아이디" />
+			<param name="SLOT_CNT"			required="yes" 	desc="수정된 슬롯개수" />
+			<puts>
+				UPDATE TB_HOLD_CATE SET SLOT_CNT = SLOT_CNT + $SLOT_CNT  WHERE ACCOUNTPK = $ACCOUNTPK AND CATE_ID = $CATE_ID	
+			</puts>
+		</sql>	
+		<sql name="store.delHoldCategory" execute="Select" type="PreparedStatement" desc="보유카테고리 삭제">
+			<param name="ACCOUNTPK"			required="yes" 	desc="계정PK" />
+			<param name="CATE_ID"			required="yes" 	desc="카테고리아이디" />
+			<puts>
+				DELETE FROM TB_HOLD_CATE WHERE ACCOUNTPK = $ACCOUNTPK AND $CATE_ID	
+			</puts>
+		</sql>			
+		<sql name="store.getInvenList" execute="Select" type="PreparedStatement" desc="보유인벤 가져오기">
+			<param name="ACCOUNTPK"			required="yes" 	desc="계정PK" />
+			<param name="CATE_ID"			required="yes" 	desc="카테고리 아이디" />
+			<param name="OFFSET" 			required="yes" 	desc="" />
+			<param name="ROWS" 				required="yes" 	desc="" />
+			<puts>
+				SELECT  INVEN_SEQ,CATE_ID,OBJ_ID,OBJ_CNT FROM TB_INVEN 
+				WHERE ACCOUNTPK = $ACCOUNTPK	AND CATE_ID = $CATE_ID
+				LIMIT $OFFSET, $ROWS
+			</puts>
+		</sql>
+		<sql name="store.getInvenCateIdCnt" execute="Select" type="PreparedStatement" desc="인벤 카테고리 개수">
+			<param name="ACCOUNTPK"			required="yes" 	desc="계정PK" />
+			<param name="CATE_ID"			required="yes" 	desc="카테고리 아이디" />
+			<puts>
+				SELECT  COUNT(*) CNT FROM TB_INVEN 
+				WHERE ACCOUNTPK = $ACCOUNTPK AND CATE_ID = $CATE_ID
+			</puts>
+		</sql>	
+		<sql name="store.getInvenObjectCnt" execute="Select" type="PreparedStatement" desc="인벤 오브젝트 존재여부">
+			<param name="ACCOUNTPK"			required="yes" 	desc="계정PK" />
+			<param name="CATE_ID"			required="yes" 	desc="카테고리 아이디" />
+			<param name="OBJ_ID"			required="yes" 	desc="오브젝트 아이디" />
+			<puts>
+				SELECT  COUNT(*) CNT FROM TB_INVEN 
+				WHERE ACCOUNTPK = $ACCOUNTPK AND CATE_ID = $CATE_ID AND OBJ_ID = $OBJ_ID
+			</puts>
+		</sql>				
+		<sql name="store.getInvenCnt" execute="Select" type="PreparedStatement" desc="인벤 오브젝트 개수">
+			<param name="INVEN_SEQ"			required="yes" 	desc="인벤코리Pk" />
+			<puts>
+				SELECT  COUNT(*) CNT FROM TB_INVEN 
+				WHERE INVEN_SEQ = $INVEN_SEQ
+			</puts>
+		</sql>			
+		<sql name="store.getInventoryInfo" execute="Select" type="PreparedStatement" desc="인벤정보 상세보기">
+			<param name="INVEN_SEQ"			required="yes" 	desc="인벤코리Pk" />
+			<puts>
+				SELECT  INVEN_SEQ,CATE_ID,OBJ_ID,OBJ_CNT FROM TB_INVEN 
+				WHERE INVEN_SEQ = $INVEN_SEQ
+			</puts>
+		</sql>	
+		<sql name="store.modInvenObjectCnt" execute="Select" type="PreparedStatement" desc="인벤 오브젝트 개수 수정">
+			<param name="INVEN_SEQ"			required="yes" 	desc="인벤코리Pk" />
+			<param name="OBJ_CNT"			required="yes" 	desc="오브젝트개수" />
+			<puts>
+				UPDATE TB_INVEN SET OBJ_CNT = $OBJ_CNT 
+				WHERE INVEN_SEQ = $INVEN_SEQ
+			</puts>
+		</sql>			
+		<sql name="store.regInvenSalesHist" execute="Select" type="PreparedStatement" desc="인벤히스토리 등록">
+			<param name="INVEN_SEQ"			required="yes" 	desc="인벤코리Pk" />
+			<param name="SALES_DIV"			required="yes" 	desc="판매구분" />
+			<puts>
+				INSERT INTO TB_INVEN_SALE_HIST(ACCOUNTPK,CATE_ID,OBJ_CNT,SALE_DIV)
+				SELECT ACCOUNTPK,CATE_ID,OBJ_CNT, $SALES_DIV AS SALE_DIV FROM TB_INVEN
+				WHERE INVEN_SEQ = $INVEN_SEQ
+			</puts>
+		</sql>
+		<sql name="store.regInvenBatchSalesHist" execute="Select" type="PreparedStatement" desc="인벤히스토리 등록">
+			<param name="ACCOUNTPK"			required="yes" 	desc="인벤코리Pk" />
+			<param name="CATE_ID"			required="yes" 	desc="카테고리 아이디" />
+			<puts>
+				INSERT INTO TB_INVEN_SALE_HIST(ACCOUNTPK,CATE_ID,OBJ_CNT)
+				SELECT ACCOUNTPK,CATE_ID,OBJ_CNT FROM TB_INVEN
+				WHERE ACCOUNTPK = $ACCOUNTPK AND CATE_ID = $CATE_ID 
+			</puts>
+		</sql>
+		<sql name="store.delInvenObject" execute="Select" type="PreparedStatement" desc="인벤오브젝트삭제">
+			<param name="INVEN_SEQ"			required="yes" 	desc="인벤코리Pk" />
+			<puts>
+				DELETE FROM TB_INVEN
+				WHERE INVEN_SEQ = $INVEN_SEQ
+			</puts>
+		</sql>	
+		<sql name="store.delInvenAllObject" execute="Select" type="PreparedStatement" desc="인벤오브젝트삭제">
+			<param name="ACCOUNTPK"			required="yes" 	desc="인벤코리Pk" />
+			<param name="CATE_ID"			required="yes" 	desc="카테고리 아이디" />
+			<puts>
+				DELETE FROM TB_INVEN
+				WHERE ACCOUNTPK = $ACCOUNTPK AND CATE_ID = $CATE_ID 
+			</puts>
+		</sql>				
+		<sql name="store.getBatchSalesInvenCurrencyList" execute="Select" type="PreparedStatement" desc="일괄판매 획득 재화">
+			<param name="ACCOUNTPK"			required="yes" 	desc="계정PK" />
+			<param name="CATE_ID"			required="yes" 	desc="카테고리 아이디" />
+			<puts>
+				SELECT A.BUY_ITEM_ID,SUM(A.SALES_CNT) SALES_CNT
+				FROM
+				(
+					SELECT A.OBJ_CNT*B.SALE_ITEM_QNT AS SALES_CNT,B.BUY_ITEM_ID
+					FROM
+					(
+						SELECT OBJ_ID,OBJ_CNT FROM TB_INVEN
+						WHERE ACCOUNTPK = $ACCOUNTPK AND CATE_ID = $CATE_ID
+					 ) A LEFT JOIN B_OBJ B
+						ON A.OBJ_ID = B.OBJ_ID
+				) A GROUP BY BUY_ITEM_ID
+			</puts>
+		</sql>				
+		<sql name="store.getUnlockObjectList" execute="Select" type="PreparedStatement" desc="잠김해제 오브젝트 가져오기">
+			<param name="ACCOUNTPK"			required="yes" 	desc="계정PK" />
+			<param name="LV"				required="yes" 	desc="레벨" />
+			<puts>
+				SELECT
+				    A.UNLOCK_SEQ,
+				    A.CATE_ID,
+				    A.OBJ_ID
+				FROM
+				(    
+					SELECT
+					    UNLOCK_SEQ,
+					    CATE_ID,
+					    OBJ_ID
+					FROM TB_UNLOCK_OBJ
+					WHERE  ACCOUNTPK = $ACCOUNTPK
+				) A INNER JOIN B_OBJ B
+				WHERE B.CATE_ID = A.CATE_ID
+				AND   B.OBJ_ID = A.OBJ_ID	
+				AND B.UNLOCK_LV > $LV;
+			</puts>
+		</sql>
+		<sql name="store.getUnLockObjectCnt" execute="Select" type="PreparedStatement" desc="잠김해제 오브젝트 소유 여부 확인">
+			<param name="ACCOUNTPK"			required="yes" 	desc="계정PK" />
+			<param name="CATE_ID"			required="yes" 	desc="카테고리 아이디" />
+			<param name="OBJ_ID"			required="yes" 	desc="오브젝트 아이디" />
+			<puts>
+				SELECT COUNT(*) AS CNT FROM TB_UNLOCK_OBJ
+				WHERE ACCOUNTPK = $ACCOUNTPK AND CATE_ID = $CATE_ID AND OBJ_ID = $OBJ_ID	
+			</puts>
+		</sql>	
+		<sql name="store.regUnLockObject" execute="Select" type="PreparedStatement" desc="잠김해제 오브젝트 등록">
+			<param name="ACCOUNTPK"			required="yes" 	desc="계정PK" />
+			<param name="CATE_ID"			required="yes" 	desc="카테고리 아이디" />
+			<param name="OBJ_ID"			required="yes" 	desc="오브젝트 아이디" />
+			<puts>
+				INSERT INTO TB_UNLOCK_OBJ(ACCOUNTPK,CATE_ID,OBJ_ID)
+				VALUES($ACCOUNTPK,$CATE_ID,$OBJ_ID)
+			</puts>
+		</sql>			
+	</module>
+</sqlm>
