@@ -116,7 +116,10 @@ public class BytomModel
 		for (AccountnoLog result : accountlist)
 		{	
 			if(accountId.equals(result.alias))
+			{
 				btmAccountId =  result.id;
+				break;
+			}
 		}
     	return btmAccountId;
     }    
@@ -133,7 +136,7 @@ public class BytomModel
     	{
     		e.printStackTrace();
     		logger.error(e);
-    		return 1;
+    		return 0;
     	}
     	return smile;
     }     
