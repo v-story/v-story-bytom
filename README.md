@@ -56,154 +56,11 @@ JR2 V-Story Answer
 
 <img src='images/tech1.PNG'/>
 
-### 구현 된 V- STORY ID와 BYTOM ALIAS ID 연동 소스 코드
-```javascript
-if(0==balanceList.size())
-{
-    btmUserInfo.setBTM((double)0);
-    btmUserInfo.setBTM_ACCOUNT_ID(bytomModel.getBtmAccountAlias(id));
-}					
-else
-{	
-    userBalanceList = new ArrayList<UserBalance>();
-    //DecimalFormat format = new DecimalFormat(".##########");
-    for (BalancenoLog result : balanceList)
-    {
-        if(id.equals(result.accountAlias))
-        {	
-            if(id.equals(result.accountAlias) && "BTM".equals(result.assetAlias))
-            {	
-                btmUserInfo.setBTM((double)result.amount/bytomMargin);
-                btmUserInfo.setBTM_ACCOUNT_ID(result.accountId);
-                break;
-            }
-        }	
-    }
-}	
-
-Integer smile = bytomModel.getSmile(accountpk);
-JSONObject jsonObject = new JSONObject();
-jsonObject.put("RESULT", IConstants.SUCCESS);
-jsonObject.put("ACCOUNTID", btmUserInfo.getACCOUNT_ID());
-jsonObject.put("GENDER", btmUserInfo.getGENDER());
-jsonObject.put("INTRODUCE", btmUserInfo.getINTRODUCE());
-jsonObject.put("PROF_PIC_NM", btmUserInfo.getPROF_PIC_NM());
-jsonObject.put("BTM", btmUserInfo.getBTM());	
-jsonObject.put("BTM_ACCOUNT_ID", btmUserInfo.getBTM_ACCOUNT_ID());	
-jsonObject.put("SMILE", smile);	
-json = jsonObject.toString();
-return json;
-```
-
 <img src='images/tech2.PNG'/>
-
-### BTM → SMILE 실제 구현된 소스 코드
-```javascript
-Client client = ByTomConnectionUtil.generateClient();
-Account.ReceiverBuilder receiverBuilder =   new Account.ReceiverBuilder().setAccountAlias(reveiverId);
-Receiver receiver = receiverBuilder.create(client);	   		
-String receiverAddress = receiver.address;
-System.out.println("receiverAddress value is:" + receiverAddress);
-TransactionnoLog.Template controlAddress = new TransactionnoLog.Builder()
-        .addAction(
-                new TransactionnoLog.Action.SpendFromAccount()
-                        .setAccountAlias(senderId)
-                        .setAssetAlias(assetAlias)
-                        .setAmount((smile+gas)*bytommargin)
-        )
-        .addAction(
-                new TransactionnoLog.Action.ControlWithAddress()
-                        .setAddress(receiverAddress)
-                        .setAssetAlias(assetAlias)
-                        .setAmount(smile*bytommargin)
-        ).build(client);
-
-
-TransactionnoLog.Template singer = new TransactionnoLog.SignerBuilder().sign(client,
-        controlAddress, passwd);	
-TransactionnoLog.SubmitResponse txs = TransactionnoLog.submit(client, singer); 
-TransactionThread transactionThread = new TransactionThread(client,txs.tx_id,smile,fromAmount,toAmount,serverIndex,accountPk,1002);
-transactionThread.start();
-return true;
-```
 
 <img src='images/tech3.PNG'/>
 
-### BTM → SMILE 환전 실제 구현된 소스 코드
-```javascript
-TransactionnoLog.Template controlAddress = new TransactionnoLog.Builder()
-        .addAction(
-                new TransactionnoLog.Action.SpendFromAccount()
-                        .setAccountAlias(senderId)
-                        .setAssetAlias(assetAlias)
-                        .setAmount((smile+gas)*bytommargin)
-        )
-        .addAction(
-                new TransactionnoLog.Action.ControlWithAddress()
-                        .setAddress(receiverAddress)
-                        .setAssetAlias(assetAlias)
-                        .setAmount(smile*bytommargin)
-        ).build(client);
-
-
-TransactionnoLog.Template singer = new TransactionnoLog.SignerBuilder().sign(client,
-        controlAddress, passwd);	
-TransactionnoLog.SubmitResponse txs = TransactionnoLog.submit(client, singer); 
-TransactionThread transactionThread = new TransactionThread(client,txs.tx_id,smile,fromAmount,toAmount,serverIndex,accountPk,1002);
-transactionThread.start();
-return true;
-```
-
-### 사용자가 보유한 BTM, SMILE의 잔액 조회 소스 코드
-```javascript
-public List<BalancenoLog> getBalance(String accountAlias,String assetAlias)
-{
-    List<BalancenoLog> balanceList = null;
-    try
-    {
-        balanceList = new BalancenoLog.QueryBuilder().listByAccountAlias(client, accountAlias); 
-    }
-    catch(BytomException e)
-    {
-        e.printStackTrace();
-    }
-    return balanceList;
-}
-```
-
 <img src='images/tech4.PNG'/>
-
-### 거래 내역 소스코드
-```javascript
-public List<BalancenoLog> getBalanceList(String accountAlias)
-{
-    List<BalancenoLog> balanceList = null;
-    try
-    {
-        balanceList = new BalancenoLog.QueryBuilder().listByAccountAlias(client, accountAlias); 
-    }
-    catch(BytomException e)
-    {
-        e.printStackTrace();
-    }
-    return balanceList;
-}
-
-public List<TransactionnoLog> listTransaction(String accountAlias)
-{
-    List<TransactionnoLog> transactionList = null;
-    try
-    {
-        String bytomId = getBtmAccountAlias(accountAlias);
-        transactionList = new TransactionnoLog.QueryBuilder().setAccountId(bytomId).listByAccountId(client);
-    }
-    catch(BytomException e)
-    {
-        logger.error(e);
-    }
-    return transactionList;
-}  
-```
 
 -------------------------------------
 
@@ -216,9 +73,6 @@ application for potential profitability.
   
 JR3 V-Story Answer
 ----
-
-- 상업적 가치를 갖고 있는기?
-- 잠재적인 수익성을 갖고 있으며 상용화 될 수 있는가?
 
 V-Story는
 
@@ -241,8 +95,6 @@ JR4 V-Story Answer
 
 V-Story는 텍스트, 사진, 영상을 넘어 아바타, 홈꾸미기 등을 통해 자신만의 개성있는 SNS를 만들며,  
 다른 사용자와 관계형 네트워크를 형성할 수 있는 새로운 개념의 비쥬얼 Social Life Service 플랫폼입니다.  
-
- - 타 솔루션과 비교하여,  더 나은 성능을 갖으며 혁신과 창의성을 갖고 있는가?
 
 사용자 접근성이 뛰어나며  
 사용자의 목적에 따라 커스텀 할 수 있는 Visual한 표현 공간을 제공하고  
