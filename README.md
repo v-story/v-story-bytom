@@ -1,4 +1,4 @@
-<img src='images/banner.png' href='http://vstory-bytom.onlinestory.co.kr:33080/index.html'/>
+[images/banner.png](http://vstory-bytom.onlinestory.co.kr:33080/index.html)
 
 Judging Rules & V-Story Answer  
 ====
