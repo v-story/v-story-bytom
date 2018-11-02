@@ -1,4 +1,4 @@
-[images/banner.png](http://vstory-bytom.onlinestory.co.kr:33080/index.html)
+[[Banner](images/banner.png)](http://vstory-bytom.onlinestory.co.kr:33080/index.html)
 
 Judging Rules & V-Story Answer  
 ====
