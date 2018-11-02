@@ -3,11 +3,11 @@ Judging Rules & V-Story Answer
 
 | Table of Contents |
 | --- |
-| [JR1 Blockchain Adoption](#JR1-Blockchain-Adoption) |
-| [JR2 Technology Implementation](#JR2-Technology-Implementation) |
-| [JR3 Commercial Value](#JR3-Commercial-Value) |
-| [JR4 Creativity](#JR4-Creativity) |
-| [JR5 Product Design](#JR5-Product-Design) |
+  [JR1 Blockchain Adoption](#JR1-Blockchain-Adoption) 
+  [JR2 Technology Implementation](#JR2-Technology-Implementation) 
+  [JR3 Commercial Value](#JR3-Commercial-Value) 
+  [JR4 Creativity](#JR4-Creativity) 
+  [JR5 Product Design](#JR5-Product-Design) 
 
 ---------------------------------
 
@@ -38,7 +38,6 @@ Social Life Service V-Story는 저작권보호, 보안, 공정성과 투명성�
   > 3가지 특징이 있음을 확인하였습니다. 이에 V-Story가 추구하는 Social Life Service  플랫폼으로 확장에   
   > 큰 도움이 될 것이라 기대하고 있습니다.  
 
-<img src='images/p1.png'/>
 
 -------------------------------------
 
